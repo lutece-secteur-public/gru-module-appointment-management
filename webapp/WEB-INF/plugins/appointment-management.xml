@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<plug-in>
+    <name>appointment-management</name>
+    <class>fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation</class>
+    <version>1.0.0-SNAPSHOT</version>
+    <documentation></documentation>
+    <installation></installation>
+    <changes></changes>
+    <user-guide></user-guide>
+    <description>module.appointment.management.module.description</description>
+    <provider>module.appointment.management.module.provider</provider>
+    <provider-url>https://dev.lutece.paris.fr</provider-url>
+    <icon-url>images/admin/skin/feature_default_icon.png</icon-url>
+    <copyright>City Of Paris</copyright>
+    <db-pool-required>1</db-pool-required>
+    
+    <core-version-dependency>
+        <min-core-version>4.1.0</min-core-version>
+        <max-core-version/>
+    </core-version-dependency>
+
+    <!-- Admin features parameters -->
+    <admin-features>
+        <admin-feature>
+            <feature-id>APPOINTMENT_SEARCH</feature-id>
+            <feature-title>module.appointment.management.adminFeature.AppointmentSearch.name</feature-title>
+            <feature-description>module.appointment.management.adminFeature.AppointmentSearch.description</feature-description>
+            <feature-level>1</feature-level>
+            <feature-url>jsp/admin/plugins/appointment/modules/management/AppointmentSearch.jsp</feature-url>
+            <feature-icon-url></feature-icon-url>
+        </admin-feature>
+    </admin-features>
+
+    <!-- XPages parameters -->
+    <applications>
+    </applications>
+
+    <!-- Portlet parameters -->
+    <portlets>
+    </portlets>
+</plug-in>
