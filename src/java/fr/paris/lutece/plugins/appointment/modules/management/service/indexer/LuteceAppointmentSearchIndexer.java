@@ -351,7 +351,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
 
         public IndexerRunnable( List<Integer> idList )
         {
-            _idList = idList;
+            _idList = new ArrayList<>( idList );
         }
 
         public IndexerRunnable( )
