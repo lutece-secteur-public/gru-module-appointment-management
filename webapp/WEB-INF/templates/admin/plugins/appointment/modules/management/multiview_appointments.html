@@ -1,9 +1,12 @@
+<#include "/admin/plugins/appointment/modules/management/multiview_export.html" />
+<@messages errors=errors warnings=warnings infos=infos />
 <@row>
     <@columns>
 		<@tform name='form' id='form' action='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp'>
 			<@input type='hidden' name='view' value='view_manage_appointments' />
 			<@div align='right'>
 				<@button style='card-control collapse' buttonTargetId='#searchAppointment' title='#i18n{appointment.manageAppointments.labelSearch}' hideTitle=['xs','sm'] buttonIcon='search' />
+				<@aButton params='data-toggle="modal" data-target="#export_modal"' buttonIcon='download' title='#i18n{appointment.permission.label.exportMassAppointment}' />
 			</@div>
 			<@fieldSet legend='#i18n{appointment.manageAppointments.labelSearch}' fieldsetId='searchAppointment'>
 				<@row>

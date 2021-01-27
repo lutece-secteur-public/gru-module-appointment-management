@@ -1,12 +1,15 @@
 package fr.paris.lutece.plugins.appointment.modules.management.web;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.appointment.business.form.Form;
@@ -15,12 +18,19 @@ import fr.paris.lutece.plugins.appointment.modules.management.business.search.Ap
 import fr.paris.lutece.plugins.appointment.modules.management.service.AppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.IAppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.search.AppointmentSortConfig;
+import fr.paris.lutece.plugins.appointment.service.AppointmentService;
+import fr.paris.lutece.plugins.appointment.service.export.AppointmentExportService;
+import fr.paris.lutece.plugins.appointment.service.export.ExcelAppointmentGenerator;
+import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFilterDTO;
+import fr.paris.lutece.plugins.filegenerator.service.TemporaryFileGeneratorService;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.web.util.LocalizedDelegatePaginator;
 import fr.paris.lutece.util.ReferenceList;
@@ -40,9 +50,13 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
     private static final String PARAMETER_ORDER_ASC = "orderAsc";
     private static final String PARAMETER_SEARCH = "Search";
     private static final String PARAMETER_RESET = "reset";
+    private static final String PARAMETER_SELECTED_DEFAULT_FIELD = "selectedDefaultFieldList";
     
     // Views
     private static final String MULTIVIEW_APPOINTMENTS = "multiview_appointments";
+    
+    // Actions
+    private static final String ACTION_EXPORT_APPOINTMENTS = "doExportAppointments";
     
     // Templates
     private static final String TEMPLATE_MULTIVIEW_APPOINTMENT = "admin/plugins/appointment/modules/management/multiview_appointments.html";
@@ -60,6 +74,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
     private static final String MARK_LIST_FORMS = "listForms";
     private static final String MARK_FILTER = "filter";
     private static final String MARK_LANGUAGE = "language";
+    private static final String MARK_DEFAULT_FIELD_LIST = "defaultFieldList";   
     
     // Variables
     private IAppointmentSearchService _appointmentSearchService = SpringContextService.getBean( AppointmentSearchService.BEAN_NAME );
@@ -95,7 +110,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         int nbResults = _appointmentSearchService.search( appointmentList, _filter, getIndexStart( ), _nItemsPerPage, _sortConfig );
         LocalizedDelegatePaginator<AppointmentSearchItem> paginator = new LocalizedDelegatePaginator<>( appointmentList, _nItemsPerPage, JSP_MANAGE_APPOINTMENT, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, nbResults, getLocale( ) );
 
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
         model.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
         model.put( MARK_PAGINATOR, paginator );
         model.put( MARK_APPOINTMENT_LIST, paginator.getPageItems( ) );
@@ -103,8 +118,44 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         model.put( MARK_FILTER, _filter );
         model.put( MARK_LANGUAGE, getLocale( ) );
         model.put( MARK_LIST_FORMS, getListForms( ) );
+        model.put( MARK_DEFAULT_FIELD_LIST, AppointmentExportService.getDefaultColumnList( getLocale( ) ) );
         
         return getPage( PROPERTY_PAGE_TITLE_MULTIVIEW_APPOINTMENTS, TEMPLATE_MULTIVIEW_APPOINTMENT, model );
+    }
+    
+    /**
+     * Do download a file from an appointment response
+     * 
+     * @param request
+     *            The request
+     * @param response
+     *            The response
+     * @return nothing.
+     * @throws AccessDeniedException
+     *             If the user is not authorized to access this feature
+     */
+    @Action( ACTION_EXPORT_APPOINTMENTS )
+    public String doExportAppointments( HttpServletRequest request ) throws AccessDeniedException
+    {
+        Locale locale = getLocale( );
+        List<AppointmentDTO> listAppointmentsDTO = new ArrayList<>( );
+        if ( _filter != null )
+        {
+            listAppointmentsDTO = AppointmentService.findListAppointmentsDTOByFilter( _filter );
+        }
+
+        List<String> defaultColumnList = new ArrayList<>( );
+        if ( ArrayUtils.isNotEmpty( request.getParameterValues( PARAMETER_SELECTED_DEFAULT_FIELD ) ) )
+        {
+            defaultColumnList = Arrays.asList( request.getParameterValues( PARAMETER_SELECTED_DEFAULT_FIELD ) );
+        }
+
+        ExcelAppointmentGenerator generator = new ExcelAppointmentGenerator( "-1", defaultColumnList, locale, listAppointmentsDTO, new ArrayList<>( ) );
+
+        TemporaryFileGeneratorService.getInstance( ).generateFile( generator, getUser( ) );
+        addInfo( "appointment.export.async.message", locale );
+
+        return getMultiviewAppointments( request );
     }
     
     private void initiatePaginatorProperties( HttpServletRequest request )
