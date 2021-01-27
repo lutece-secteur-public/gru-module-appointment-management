@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,7 +44,6 @@ import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
 import fr.paris.lutece.portal.business.indexeraction.IndexerActionHome;
-import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.SearchItem;
@@ -238,13 +236,9 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_ADMIN, new BytesRef( admin ) ) );
         
         // --- Status
-        String status = I18nService.getLocalizedString( AppointmentDTO.PROPERTY_APPOINTMENT_STATUS_RESERVED, Locale.getDefault( ) );
-        if ( appointmentDTO.getIsCancelled( ) )
-        {
-            status = I18nService.getLocalizedString( AppointmentDTO.PROPERTY_APPOINTMENT_STATUS_UNRESERVED, Locale.getDefault( ) );
-        }
-        doc.add( new StringField( AppointmentSearchItem.FIELD_STATUS, status, Field.Store.YES ) );
-        doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_STATUS, new BytesRef( status ) ) );
+        String cancelled = String.valueOf( appointmentDTO.getIsCancelled( ) );
+        doc.add( new StringField( AppointmentSearchItem.FIELD_CANCELLED, cancelled, Field.Store.YES ) );
+        doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_CANCELLED, new BytesRef( cancelled ) ) );
         
         // --- State
         if ( appointmentState != null )

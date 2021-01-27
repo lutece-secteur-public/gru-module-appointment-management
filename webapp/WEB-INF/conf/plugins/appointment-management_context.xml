@@ -4,8 +4,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
 
+    <bean id="appointment-management.appointmentSearchService" class="fr.paris.lutece.plugins.appointment.modules.management.service.AppointmentSearchService"/>
+
     <!-- Lucene Search services implementation -->
     <bean id="appointment-management.luceneAppointmentListener" class="fr.paris.lutece.plugins.appointment.modules.management.service.indexer.LuceneAppointmentListener"/>
+    <bean id="appointment-management.appointmentSearchEngine" class="fr.paris.lutece.plugins.appointment.modules.management.service.search.AppointmentSearchEngine"/>
     <bean id="appointment-management.luceneAppointmentIndexFactory" class="fr.paris.lutece.plugins.appointment.modules.management.service.indexer.LuceneAppointmentIndexFactory" scope="singleton"/>
     <bean id="appointment-management.luteceAppointmentSearchIndexer" class="fr.paris.lutece.plugins.appointment.modules.management.service.indexer.LuteceAppointmentSearchIndexer"/>
     <bean id="appointment-management.luceneAnalizer" class="fr.paris.lutece.plugins.lucene.service.analyzer.LuteceFrenchAnalyzer"/>
