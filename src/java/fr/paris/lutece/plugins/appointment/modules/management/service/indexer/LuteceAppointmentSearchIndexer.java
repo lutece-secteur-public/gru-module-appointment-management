@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2021, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.appointment.modules.management.service.indexer;
 
 import java.io.IOException;
@@ -66,20 +99,20 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     @Inject
     private LuceneAppointmentIndexFactory _luceneAppointmentIndexFactory;
     private IndexWriter _indexWriter;
-    
+
     @Autowired( required = false )
     private StateService _stateService;
-    
+
     private static AtomicBoolean _bIndexIsRunning = new AtomicBoolean( false );
     private static AtomicBoolean _bIndexToLunch = new AtomicBoolean( false );
-    
+
     private static final Object LOCK = new Object( );
-    
+
     public LuteceAppointmentSearchIndexer( )
     {
         IndexationService.registerIndexer( this );
     }
-    
+
     @Override
     public String getName( )
     {
@@ -91,45 +124,45 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     {
         return INDEXER_DESCRIPTION;
     }
-    
+
     @Override
     public String getVersion( )
     {
         return INDEXER_VERSION;
     }
-    
+
     @Override
     public boolean isEnable( )
     {
         return AppPropertiesService.getPropertyBoolean( PROPERTY_INDEXER_ENABLE, false );
     }
-    
+
     @Override
     public List<String> getListType( )
     {
         return Collections.singletonList( APPOINTMENTS );
     }
-    
+
     @Override
     public String getSpecificSearchAppUrl( )
     {
         return "";
     }
-    
+
     @Override
     public void indexDocuments( ) throws IOException, InterruptedException, SiteMessageException
     {
         List<Integer> listAppointmentId = AppointmentHome.selectAllAppointmentId( );
-        
+
         deleteIndex( );
         _bIndexToLunch.set( true );
-        
+
         if ( _bIndexIsRunning.compareAndSet( false, true ) )
         {
             new Thread( new IndexerRunnable( listAppointmentId ) ).start( );
         }
     }
-    
+
     @Override
     public void indexDocument( int nIdAppointment, int idTask )
     {
@@ -138,14 +171,14 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         action.setIdTask( idTask );
         action.setIndexerName( INDEXER_NAME );
         IndexerActionHome.create( action );
-        
+
         _bIndexToLunch.set( true );
         if ( _bIndexIsRunning.compareAndSet( false, true ) )
         {
             new Thread( new IndexerRunnable( ) ).start( );
         }
     }
-    
+
     @Override
     public List<Document> getDocuments( String strIdDocument ) throws IOException, InterruptedException, SiteMessageException
     {
@@ -160,23 +193,23 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             AppLogService.error( strIdDocument + " not parseable to an int", ne );
             return new ArrayList<>( 0 );
         }
-        
+
         AppointmentDTO appointment = AppointmentService.buildAppointmentDTOFromIdAppointment( nIdAppointment );
         Form form = FormHome.findByPrimaryKey( appointment.getIdForm( ) );
-        
+
         State appointmentState = null;
         if ( _stateService != null )
         {
             appointmentState = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
         }
-        
+
         Document doc = getDocument( appointment, appointmentState );
-        
+
         List<Document> listDocument = new ArrayList<>( 1 );
         listDocument.add( doc );
         return listDocument;
     }
-    
+
     /**
      * Builds a document which will be used by Lucene during the indexing of this record
      * 
@@ -190,56 +223,56 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     {
         // make a new, empty document
         Document doc = new Document( );
-        
+
         int nIdAppointment = appointmentDTO.getIdAppointment( );
 
         // --- document identifier
         doc.add( new StringField( SearchItem.FIELD_UID, String.valueOf( nIdAppointment ), Field.Store.YES ) );
-        
+
         // --- form response identifier
         doc.add( new IntPoint( AppointmentSearchItem.FIELD_ID_APPOINTMENT, nIdAppointment ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_ID_APPOINTMENT, nIdAppointment ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_ID_APPOINTMENT, nIdAppointment ) );
-        
+
         // --- id form
         doc.add( new IntPoint( AppointmentSearchItem.FIELD_ID_FORM, appointmentDTO.getIdForm( ) ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_ID_FORM, appointmentDTO.getIdForm( ) ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_ID_FORM, appointmentDTO.getIdForm( ) ) );
-        
+
         // --- First name
         doc.add( new StringField( AppointmentSearchItem.FIELD_FIRST_NAME, appointmentDTO.getFirstName( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_FIRST_NAME, new BytesRef( appointmentDTO.getFirstName( ) ) ) );
-        
+
         // --- First name
         doc.add( new StringField( AppointmentSearchItem.FIELD_LAST_NAME, appointmentDTO.getLastName( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_LAST_NAME, new BytesRef( appointmentDTO.getLastName( ) ) ) );
-        
+
         // --- Mail
         doc.add( new StringField( AppointmentSearchItem.FIELD_MAIL, appointmentDTO.getEmail( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_MAIL, new BytesRef( appointmentDTO.getEmail( ) ) ) );
-        
+
         // --- Starting date appointment
         Long longStartDate = Timestamp.valueOf( appointmentDTO.getStartingDateTime( ) ).getTime( );
         doc.add( new LongPoint( AppointmentSearchItem.FIELD_START_DATE, longStartDate ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_START_DATE, longStartDate ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_START_DATE, longStartDate ) );
-        
+
         // --- Ending date appointment
         Long longEndDate = Timestamp.valueOf( appointmentDTO.getEndingDateTime( ) ).getTime( );
         doc.add( new LongPoint( AppointmentSearchItem.FIELD_END_DATE, longEndDate ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_END_DATE, longEndDate ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_END_DATE, longEndDate ) );
-        
+
         // --- Admin user
         String admin = appointmentDTO.getAdminUser( );
         doc.add( new StringField( AppointmentSearchItem.FIELD_ADMIN, admin, Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_ADMIN, new BytesRef( admin ) ) );
-        
+
         // --- Status
         String cancelled = String.valueOf( appointmentDTO.getIsCancelled( ) );
         doc.add( new StringField( AppointmentSearchItem.FIELD_CANCELLED, cancelled, Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_CANCELLED, new BytesRef( cancelled ) ) );
-        
+
         // --- State
         if ( appointmentState != null )
         {
@@ -249,21 +282,21 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_ID_WORKFLOW_STATE, nIdWorkflowState ) );
             doc.add( new StoredField( AppointmentSearchItem.FIELD_ID_WORKFLOW_STATE, nIdWorkflowState ) );
         }
-        
+
         // --- Nb Seats
         doc.add( new IntPoint( AppointmentSearchItem.FIELD_NB_SEATS, appointmentDTO.getNbBookedSeats( ) ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_NB_SEATS, appointmentDTO.getNbBookedSeats( ) ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_NB_SEATS, appointmentDTO.getNbBookedSeats( ) ) );
-        
+
         // --- Date appointment Taken
         Long longAppointmentTaken = Timestamp.valueOf( appointmentDTO.getDateAppointmentTaken( ) ).getTime( );
         doc.add( new LongPoint( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
-        
+
         return doc;
     }
-    
+
     private void deleteIndex( )
     {
         if ( _indexWriter == null || !_indexWriter.isOpen( ) )
@@ -283,7 +316,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             endIndexing( );
         }
     }
-    
+
     /**
      * Init the indexing action
      * 
@@ -293,7 +326,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     {
         _indexWriter = _luceneAppointmentIndexFactory.getIndexWriter( bCreate );
     }
-    
+
     /**
      * End the indexing action
      */
@@ -311,21 +344,21 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             }
         }
     }
-    
+
     private class IndexerRunnable implements Runnable
     {
         private final List<Integer> _idList;
-        
+
         public IndexerRunnable( List<Integer> idList )
         {
             _idList = idList;
         }
-        
+
         public IndexerRunnable( )
         {
             _idList = new ArrayList<>( );
         }
-        
+
         @Override
         public void run( )
         {
@@ -347,16 +380,16 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                 _bIndexIsRunning.set( false );
             }
         }
-        
+
         private void processIndexing( )
         {
             synchronized( LOCK )
             {
                 initIndexing( false );
-                
+
                 Set<Integer> listIdsToAdd = new HashSet<>( );
                 Set<Integer> listIdsToDelete = new HashSet<>( );
-                
+
                 // Delete all record which must be delete
                 IndexerActionFilter filter = new IndexerActionFilter( );
                 filter.setIdTask( IndexerAction.TASK_DELETE );
@@ -365,7 +398,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                     listIdsToDelete.add( Integer.valueOf( action.getIdDocument( ) ) );
                     IndexerActionHome.remove( action.getIdAction( ) );
                 }
-                
+
                 // Update all record which must be update
                 filter.setIdTask( IndexerAction.TASK_MODIFY );
                 for ( IndexerAction action : IndexerActionHome.getList( filter ) )
@@ -374,7 +407,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                     listIdsToAdd.add( Integer.valueOf( action.getIdDocument( ) ) );
                     IndexerActionHome.remove( action.getIdAction( ) );
                 }
-                
+
                 // Update all record which must be update
                 filter.setIdTask( IndexerAction.TASK_CREATE );
                 for ( IndexerAction action : IndexerActionHome.getList( filter ) )
@@ -382,7 +415,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                     listIdsToAdd.add( Integer.valueOf( action.getIdDocument( ) ) );
                     IndexerActionHome.remove( action.getIdAction( ) );
                 }
-                
+
                 List<Query> queryList = new ArrayList<>( TAILLE_LOT );
                 for ( Integer nIdAppointment : listIdsToDelete )
                 {
@@ -395,13 +428,13 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                 }
                 deleteDocument( queryList );
                 queryList.clear( );
-                
+
                 processIdList( listIdsToAdd );
-                
+
                 endIndexing( );
             }
         }
-        
+
         private void processIdList( Collection<Integer> idList )
         {
             List<Integer> partialIdList = new ArrayList<>( TAILLE_LOT );
@@ -412,7 +445,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                 {
                     AppointmentFilterDTO filter = new AppointmentFilterDTO( );
                     filter.setListIdAppointment( partialIdList );
-                    
+
                     List<AppointmentDTO> appointmentList = AppointmentService.findListAppointmentsDTOByFilter( filter );
                     indexAppointmentList( appointmentList );
                     partialIdList.clear( );
@@ -423,14 +456,14 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             {
                 AppointmentFilterDTO filter = new AppointmentFilterDTO( );
                 filter.setListIdAppointment( partialIdList );
-                
+
                 List<AppointmentDTO> appointmentList = AppointmentService.findListAppointmentsDTOByFilter( filter );
                 indexAppointmentList( appointmentList );
                 partialIdList.clear( );
                 appointmentList.clear( );
             }
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -440,10 +473,10 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             {
                 initIndexing( true );
             }
-            
+
             Map<Integer, Form> mapForms = FormHome.findAllForms( ).stream( ).collect( Collectors.toMap( Form::getIdForm, Function.identity( ) ) );
             List<Document> documentList = new ArrayList<>( );
-            
+
             for ( AppointmentDTO appointment : listAppointment )
             {
                 if ( appointment.getIdUser( ) > 0 )
@@ -451,14 +484,15 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                     User user = UserHome.findByPrimaryKey( appointment.getIdUser( ) );
                     appointment.setUser( user );
                 }
-                
+
                 int formId = appointment.getSlot( ).get( 0 ).getIdForm( );
                 Form form = mapForms.get( formId );
-                
+
                 State appointmentState = null;
                 if ( _stateService != null )
                 {
-                    appointmentState = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+                    appointmentState = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE,
+                            form.getIdWorkflow( ) );
                 }
                 Document doc = null;
                 try
@@ -478,7 +512,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             addDocuments( documentList );
             endIndexing( );
         }
-        
+
         private void addDocuments( List<Document> documentList )
         {
             try
@@ -491,7 +525,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             }
             documentList.clear( );
         }
-        
+
         private void deleteDocument( List<Query> luceneQueryList )
         {
             try

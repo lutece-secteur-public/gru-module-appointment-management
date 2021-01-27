@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2021, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.appointment.modules.management.service.search;
 
 import java.io.IOException;
@@ -40,12 +73,13 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
     private LuceneAppointmentIndexFactory _indexFactory;
 
     @Override
-    public int getSearchResult( List<AppointmentSearchItem> result, AppointmentFilterDTO filter, int nStartIndex, int nPageSize, AppointmentSortConfig sortConfig )
+    public int getSearchResult( List<AppointmentSearchItem> result, AppointmentFilterDTO filter, int nStartIndex, int nPageSize,
+            AppointmentSortConfig sortConfig )
     {
         int nbResults = 0;
         Query query = createQuery( filter );
         Sort sort = buildLuceneSort( sortConfig );
-        
+
         try ( Directory directory = _indexFactory.getDirectory( ) ; IndexReader ir = DirectoryReader.open( directory ) ; )
         {
             IndexSearcher searcher = new IndexSearcher( ir );
@@ -59,7 +93,7 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
             {
                 topDocs = searcher.search( query, LuceneSearchEngine.MAX_RESPONSES );
             }
-            
+
             ScoreDoc [ ] hits = topDocs.scoreDocs;
             nbResults = hits.length;
             int nMaxIndex = hits.length;
@@ -67,10 +101,10 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
             {
                 nMaxIndex = Math.min( nStartIndex + nPageSize, hits.length );
             }
-            
+
             for ( int i = nStartIndex; i < nMaxIndex; i++ )
             {
-                Document document = searcher.doc( hits[i].doc );
+                Document document = searcher.doc( hits [i].doc );
                 result.add( new AppointmentSearchItem( document ) );
             }
         }
@@ -80,7 +114,7 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         }
         return nbResults;
     }
-    
+
     private Query createQuery( AppointmentFilterDTO filter )
     {
         BooleanQuery.Builder builder = new BooleanQuery.Builder( );
@@ -107,18 +141,18 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         builder.add( createDateRangeQuery( filter ), BooleanClause.Occur.MUST );
         if ( filter.getStatus( ) != -1 )
         {
-            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_CANCELLED, String.valueOf( filter.getStatus( ) == 1) ) );
+            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_CANCELLED, String.valueOf( filter.getStatus( ) == 1 ) ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
-        
+
         return builder.build( );
     }
-    
+
     private Query createDateRangeQuery( AppointmentFilterDTO filter )
     {
         Query query = null;
         Timestamp startingTimestamp = null;
-        if ( filter.getStartingDateOfSearch( ) != null  )
+        if ( filter.getStartingDateOfSearch( ) != null )
         {
             LocalDate startingDate = filter.getStartingDateOfSearch( ).toLocalDate( );
             if ( StringUtils.isNotEmpty( filter.getStartingTimeOfSearch( ) ) )
@@ -131,7 +165,7 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
             }
         }
         Timestamp endingTimestamp = null;
-        if ( filter.getEndingDateOfSearch( ) != null  )
+        if ( filter.getEndingDateOfSearch( ) != null )
         {
             LocalDate startingDate = filter.getEndingDateOfSearch( ).toLocalDate( );
             if ( StringUtils.isNotEmpty( filter.getEndingTimeOfSearch( ) ) )
@@ -147,18 +181,20 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         {
             query = LongPoint.newRangeQuery( AppointmentSearchItem.FIELD_START_DATE, startingTimestamp.getTime( ), endingTimestamp.getTime( ) );
         }
-        else if ( startingTimestamp != null )
-        {
-            query = LongPoint.newRangeQuery( AppointmentSearchItem.FIELD_START_DATE, startingTimestamp.getTime( ), Long.MAX_VALUE );
-        }
-        else if ( endingTimestamp != null )
-        {
-            query = LongPoint.newRangeQuery( AppointmentSearchItem.FIELD_START_DATE, Long.MIN_VALUE, endingTimestamp.getTime( ) );
-        }
         else
-        {
-            query = LongPoint.newRangeQuery( AppointmentSearchItem.FIELD_START_DATE, Long.MIN_VALUE, Long.MAX_VALUE );
-        }
+            if ( startingTimestamp != null )
+            {
+                query = LongPoint.newRangeQuery( AppointmentSearchItem.FIELD_START_DATE, startingTimestamp.getTime( ), Long.MAX_VALUE );
+            }
+            else
+                if ( endingTimestamp != null )
+                {
+                    query = LongPoint.newRangeQuery( AppointmentSearchItem.FIELD_START_DATE, Long.MIN_VALUE, endingTimestamp.getTime( ) );
+                }
+                else
+                {
+                    query = LongPoint.newRangeQuery( AppointmentSearchItem.FIELD_START_DATE, Long.MIN_VALUE, Long.MAX_VALUE );
+                }
         return query;
     }
 

@@ -1,3 +1,36 @@
+/*
+ * Copyright (c) 2002-2021, City of Paris
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *  1. Redistributions of source code must retain the above copyright notice
+ *     and the following disclaimer.
+ *
+ *  2. Redistributions in binary form must reproduce the above copyright notice
+ *     and the following disclaimer in the documentation and/or other materials
+ *     provided with the distribution.
+ *
+ *  3. Neither the name of 'Mairie de Paris' nor 'Lutece' nor the names of its
+ *     contributors may be used to endorse or promote products derived from
+ *     this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * License 1.0
+ */
 package fr.paris.lutece.plugins.appointment.modules.management.business.search;
 
 import java.time.Instant;
@@ -20,7 +53,7 @@ public class AppointmentSearchItem extends SearchItem
 
     public static final String FIELD_DATE_SUFFIX = "_date";
     public static final String FIELD_INT_SUFFIX = "_int";
-    
+
     public static final String FIELD_ID_APPOINTMENT = "id_appointment";
     public static final String FIELD_ID_FORM = "id_form";
     public static final String FIELD_FIRST_NAME = "first_name";
@@ -48,11 +81,11 @@ public class AppointmentSearchItem extends SearchItem
     private int _idState;
     private int _nbSeats;
     private LocalDateTime _dateAppointmentTaken;
-    
+
     private String _dateOfTheAppointment;
     private LocalTime _startingTime;
     private LocalTime _endingTime;
-    
+
     private String _stateTitle = "";
     private String _formTitle = "";
 
@@ -72,7 +105,7 @@ public class AppointmentSearchItem extends SearchItem
         _idState = manageIntegerNullValue( document.get( AppointmentSearchItem.FIELD_ID_WORKFLOW_STATE ) );
         _nbSeats = manageIntegerNullValue( document.get( AppointmentSearchItem.FIELD_NB_SEATS ) );
         _dateAppointmentTaken = parseDate( document.get( FIELD_DATE_APPOINTMENT_TAKEN ) );
-        
+
         _dateOfTheAppointment = _startDate.toLocalDate( ).format( Utilities.getFormatter( ) );
         _startingTime = _startDate.toLocalTime( );
         _endingTime = _endDate.toLocalTime( );
@@ -203,7 +236,8 @@ public class AppointmentSearchItem extends SearchItem
     }
 
     /**
-     * @param stateTitle the stateTitle to set
+     * @param stateTitle
+     *            the stateTitle to set
      */
     public void setStateTitle( String stateTitle )
     {
@@ -219,7 +253,8 @@ public class AppointmentSearchItem extends SearchItem
     }
 
     /**
-     * @param formTitle the formTitle to set
+     * @param formTitle
+     *            the formTitle to set
      */
     public void setFormTitle( String formTitle )
     {
@@ -249,7 +284,7 @@ public class AppointmentSearchItem extends SearchItem
     {
         return _endingTime;
     }
-    
+
     /**
      * 
      * @return _cancelled
