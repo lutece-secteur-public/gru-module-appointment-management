@@ -58,6 +58,7 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortedNumericSortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 
 import fr.paris.lutece.plugins.appointment.modules.management.business.search.AppointmentSearchItem;
@@ -125,17 +126,17 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         }
         if ( StringUtils.isNotEmpty( filter.getFirstName( ) ) )
         {
-            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, filter.getFirstName( ).toLowerCase( ) ) );
+            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, WildcardQuery.WILDCARD_STRING + filter.getFirstName( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         if ( StringUtils.isNotEmpty( filter.getLastName( ) ) )
         {
-            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_LAST_NAME_SEARCH, filter.getLastName( ).toLowerCase( ) ) );
+            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_LAST_NAME_SEARCH, WildcardQuery.WILDCARD_STRING + filter.getLastName( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         if ( StringUtils.isNotEmpty( filter.getEmail( ) ) )
         {
-            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_MAIL_SEARCH, filter.getEmail( ).toLowerCase( ) ) );
+            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_MAIL_SEARCH, WildcardQuery.WILDCARD_STRING + filter.getEmail( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         builder.add( createDateRangeQuery( filter ), BooleanClause.Occur.MUST );
