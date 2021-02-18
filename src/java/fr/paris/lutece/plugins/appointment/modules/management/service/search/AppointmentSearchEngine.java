@@ -125,17 +125,17 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         }
         if ( StringUtils.isNotEmpty( filter.getFirstName( ) ) )
         {
-            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_FIRST_NAME, filter.getFirstName( ) ) );
+            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, filter.getFirstName( ).toLowerCase( ) ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         if ( StringUtils.isNotEmpty( filter.getLastName( ) ) )
         {
-            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_LAST_NAME, filter.getLastName( ) ) );
+            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_LAST_NAME_SEARCH, filter.getLastName( ).toLowerCase( ) ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         if ( StringUtils.isNotEmpty( filter.getEmail( ) ) )
         {
-            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_MAIL, filter.getEmail( ) ) );
+            Query query = new TermQuery( new Term( AppointmentSearchItem.FIELD_MAIL_SEARCH, filter.getEmail( ).toLowerCase( ) ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         builder.add( createDateRangeQuery( filter ), BooleanClause.Occur.MUST );

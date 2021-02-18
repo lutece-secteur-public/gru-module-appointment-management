@@ -57,8 +57,11 @@ public class AppointmentSearchItem extends SearchItem
     public static final String FIELD_ID_APPOINTMENT = "id_appointment";
     public static final String FIELD_ID_FORM = "id_form";
     public static final String FIELD_FIRST_NAME = "first_name";
+    public static final String FIELD_FIRST_NAME_SEARCH = "first_name_search";
     public static final String FIELD_LAST_NAME = "last_name";
+    public static final String FIELD_LAST_NAME_SEARCH = "last_name_search";
     public static final String FIELD_MAIL = "mail";
+    public static final String FIELD_MAIL_SEARCH = "mail_search";
     public static final String FIELD_START_DATE = "start_date";
     public static final String FIELD_END_DATE = "end_date";
     public static final String FIELD_ADMIN = "admin";
