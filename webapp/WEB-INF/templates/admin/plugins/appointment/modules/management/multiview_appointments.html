@@ -116,10 +116,6 @@
 					<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=start_date&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 					<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=start_date&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
 				</@th>
-				<@th>#i18n{appointment.manageAppointments.columnAdmin} 
-					<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=admin&orderBy=start_date&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
-					<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=admin&orderBy=start_date&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
-				</@th>
 				<@th>#i18n{appointment.labelStatus}
 					<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=cancelled&orderBy=start_date&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 					<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=cancelled&orderBy=start_date&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
@@ -138,7 +134,6 @@
 						<@td>${appointment.mail}</@td>
 						<@td>${appointment.nbSeats}</@td>
 						<@td>${appointment.dateOfTheAppointment} #i18n{appointment.labelFrom} ${appointment.startingTime} #i18n{appointment.labelTo} ${appointment.endingTime}</@td>
-						<@td>${appointment.admin}</@td>
 						<@td>
 							<#if appointment.cancelled>
 								<@tag color='important'>#i18n{appointment.message.labelStatusUnreserved}</@tag>
