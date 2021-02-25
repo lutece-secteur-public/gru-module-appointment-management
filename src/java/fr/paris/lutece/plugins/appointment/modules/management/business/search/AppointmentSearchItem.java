@@ -89,9 +89,12 @@ public class AppointmentSearchItem extends SearchItem
     private String _dateOfTheAppointment;
     private LocalTime _startingTime;
     private LocalTime _endingTime;
+    
+    private int _idCategory;
 
     private String _stateTitle = "";
     private String _formTitle = "";
+    private String _categoryTitle = "";
 
     public AppointmentSearchItem( Document document )
     {
@@ -113,6 +116,7 @@ public class AppointmentSearchItem extends SearchItem
         _dateOfTheAppointment = _startDate.toLocalDate( ).format( Utilities.getFormatter( ) );
         _startingTime = _startDate.toLocalTime( );
         _endingTime = _endDate.toLocalTime( );
+        _idCategory = manageIntegerNullValue( document.get( AppointmentSearchItem.FIELD_ID_CATEGORY ) );
     }
 
     /**
@@ -296,5 +300,29 @@ public class AppointmentSearchItem extends SearchItem
     public boolean isCancelled( )
     {
         return _cancelled;
+    }
+
+    /**
+     * @return the categoryTitle
+     */
+    public String getCategoryTitle( )
+    {
+        return _categoryTitle;
+    }
+
+    /**
+     * @param categoryTitle the categoryTitle to set
+     */
+    public void setCategoryTitle( String categoryTitle )
+    {
+        _categoryTitle = categoryTitle;
+    }
+
+    /**
+     * @return the idCategory
+     */
+    public int getIdCategory( )
+    {
+        return _idCategory;
     }
 }

@@ -94,7 +94,9 @@
 				<@paginationAdmin paginator=paginator />
 			</@div>
 			<@table>
-		<@th>#i18n{module.appointment.management.multiview.columnFormTitle} 
+				<@th>#i18n{module.appointment.management.multiview.columnCategory} 
+				</@th>
+				<@th>#i18n{module.appointment.management.multiview.columnFormTitle} 
 				</@th>
 				<@th>#i18n{appointment.manageAppointments.columnLastName}
 					<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=last_name&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
@@ -128,6 +130,7 @@
 				
 				<#list appointment_list as appointment >
 					<@tr>
+						<@td>${appointment.categoryTitle}</@td>
 						<@td>${appointment.formTitle}</@td>
 						<@td>${appointment.lastName}</@td>
 						<@td>${appointment.firstName}</@td>

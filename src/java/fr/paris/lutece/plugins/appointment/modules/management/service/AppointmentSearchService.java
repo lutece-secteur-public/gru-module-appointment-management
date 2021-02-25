@@ -43,6 +43,8 @@ import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.paris.lutece.plugins.appointment.business.category.Category;
+import fr.paris.lutece.plugins.appointment.business.category.CategoryHome;
 import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.form.FormHome;
 import fr.paris.lutece.plugins.appointment.modules.management.business.search.AppointmentSearchItem;
@@ -69,6 +71,8 @@ public class AppointmentSearchService implements IAppointmentSearchService
         int nbResults = _searchEngine.getSearchResult( results, filter, nStartIndex, nPageSize, sortConfig );
         Map<Integer, Form> mapForms = FormHome.findAllForms( ).stream( ).collect( Collectors.toMap( Form::getIdForm, Function.identity( ) ) );
         Map<Integer, State> mapState = new HashMap<>( );
+        Map<Integer, Category> mapCategory = CategoryHome.findAllCategories( ).stream( ).collect( Collectors.toMap( Category::getIdCategory, Function.identity( ) ) );
+        
         if ( _stateService != null )
         {
             List<State> stateList = _stateService.getListStateByFilter( new StateFilter( ) );
@@ -79,6 +83,7 @@ public class AppointmentSearchService implements IAppointmentSearchService
         {
             Form form = mapForms.get( item.getIdForm( ) );
             State state = mapState.get( item.getIdState( ) );
+            Category category = mapCategory.get( item.getIdCategory( ) );
 
             if ( form != null )
             {
@@ -87,6 +92,10 @@ public class AppointmentSearchService implements IAppointmentSearchService
             if ( state != null )
             {
                 item.setStateTitle( state.getName( ) );
+            }
+            if ( category != null )
+            {
+                item.setCategoryTitle( category.getLabel( ) );
             }
         }
         return nbResults;
