@@ -203,7 +203,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             appointmentState = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
         }
 
-        Document doc = getDocument( appointment, appointmentState );
+        Document doc = getDocument( appointment, appointmentState, form.getIdCategory( ) );
 
         List<Document> listDocument = new ArrayList<>( 1 );
         listDocument.add( doc );
@@ -219,7 +219,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
      *            the form
      * @return a lucene document filled with the record data
      */
-    private Document getDocument( AppointmentDTO appointmentDTO, State appointmentState )
+    private Document getDocument( AppointmentDTO appointmentDTO, State appointmentState, int idCategory )
     {
         // make a new, empty document
         Document doc = new Document( );
@@ -302,7 +302,11 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         doc.add( new LongPoint( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
-
+        
+        // -- Category
+        doc.add( new IntPoint( AppointmentSearchItem.FIELD_ID_CATEGORY, idCategory ) );
+        doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_ID_CATEGORY, idCategory ) );
+        doc.add( new StoredField( AppointmentSearchItem.FIELD_ID_CATEGORY, idCategory ) );
         return doc;
     }
 
@@ -506,7 +510,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                 Document doc = null;
                 try
                 {
-                    doc = getDocument( appointment, appointmentState );
+                    doc = getDocument( appointment, appointmentState, form.getIdCategory( ) );
                 }
                 catch( Exception e )
                 {

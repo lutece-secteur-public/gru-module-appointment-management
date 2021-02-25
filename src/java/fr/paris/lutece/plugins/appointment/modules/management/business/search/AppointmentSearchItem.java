@@ -69,6 +69,7 @@ public class AppointmentSearchItem extends SearchItem
     public static final String FIELD_ID_WORKFLOW_STATE = "id_workflow_state";
     public static final String FIELD_NB_SEATS = "nb_seats_int";
     public static final String FIELD_DATE_APPOINTMENT_TAKEN = "appointment_taken_date";
+    public static final String FIELD_ID_CATEGORY = "id_category";
 
     private static final int INTEGER_MINUS_ONE = -1;
 
