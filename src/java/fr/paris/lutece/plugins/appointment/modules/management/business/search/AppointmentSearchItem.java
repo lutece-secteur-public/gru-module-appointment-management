@@ -89,7 +89,7 @@ public class AppointmentSearchItem extends SearchItem
     private String _dateOfTheAppointment;
     private LocalTime _startingTime;
     private LocalTime _endingTime;
-    
+
     private int _idCategory;
 
     private String _stateTitle = "";
@@ -311,7 +311,8 @@ public class AppointmentSearchItem extends SearchItem
     }
 
     /**
-     * @param categoryTitle the categoryTitle to set
+     * @param categoryTitle
+     *            the categoryTitle to set
      */
     public void setCategoryTitle( String categoryTitle )
     {

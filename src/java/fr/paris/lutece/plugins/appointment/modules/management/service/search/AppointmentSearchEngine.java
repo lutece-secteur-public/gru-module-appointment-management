@@ -74,8 +74,7 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
     private LuceneAppointmentIndexFactory _indexFactory;
 
     @Override
-    public int getSearchResult( List<AppointmentSearchItem> result, MultiviewFilter filter, int nStartIndex, int nPageSize,
-            AppointmentSortConfig sortConfig )
+    public int getSearchResult( List<AppointmentSearchItem> result, MultiviewFilter filter, int nStartIndex, int nPageSize, AppointmentSortConfig sortConfig )
     {
         int nbResults = 0;
         Query query = createQuery( filter );
@@ -131,17 +130,20 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         }
         if ( StringUtils.isNotEmpty( filter.getFirstName( ) ) )
         {
-            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, WildcardQuery.WILDCARD_STRING + filter.getFirstName( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
+            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH,
+                    WildcardQuery.WILDCARD_STRING + filter.getFirstName( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         if ( StringUtils.isNotEmpty( filter.getLastName( ) ) )
         {
-            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_LAST_NAME_SEARCH, WildcardQuery.WILDCARD_STRING + filter.getLastName( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
+            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_LAST_NAME_SEARCH,
+                    WildcardQuery.WILDCARD_STRING + filter.getLastName( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         if ( StringUtils.isNotEmpty( filter.getEmail( ) ) )
         {
-            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_MAIL_SEARCH, WildcardQuery.WILDCARD_STRING + filter.getEmail( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
+            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_MAIL_SEARCH,
+                    WildcardQuery.WILDCARD_STRING + filter.getEmail( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
         builder.add( createDateRangeQuery( filter ), BooleanClause.Occur.MUST );

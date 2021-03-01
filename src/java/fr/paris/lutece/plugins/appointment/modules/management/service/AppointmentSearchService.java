@@ -71,8 +71,9 @@ public class AppointmentSearchService implements IAppointmentSearchService
         int nbResults = _searchEngine.getSearchResult( results, filter, nStartIndex, nPageSize, sortConfig );
         Map<Integer, Form> mapForms = FormHome.findAllForms( ).stream( ).collect( Collectors.toMap( Form::getIdForm, Function.identity( ) ) );
         Map<Integer, State> mapState = new HashMap<>( );
-        Map<Integer, Category> mapCategory = CategoryHome.findAllCategories( ).stream( ).collect( Collectors.toMap( Category::getIdCategory, Function.identity( ) ) );
-        
+        Map<Integer, Category> mapCategory = CategoryHome.findAllCategories( ).stream( )
+                .collect( Collectors.toMap( Category::getIdCategory, Function.identity( ) ) );
+
         if ( _stateService != null )
         {
             List<State> stateList = _stateService.getListStateByFilter( new StateFilter( ) );

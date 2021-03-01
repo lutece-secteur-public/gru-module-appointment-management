@@ -242,21 +242,21 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         // --- First name
         doc.add( new StringField( AppointmentSearchItem.FIELD_FIRST_NAME, appointmentDTO.getFirstName( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_FIRST_NAME, new BytesRef( appointmentDTO.getFirstName( ) ) ) );
-        
+
         doc.add( new StringField( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, appointmentDTO.getFirstName( ).toLowerCase( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, new BytesRef( appointmentDTO.getFirstName( ).toLowerCase( ) ) ) );
 
         // --- First name
         doc.add( new StringField( AppointmentSearchItem.FIELD_LAST_NAME, appointmentDTO.getLastName( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_LAST_NAME, new BytesRef( appointmentDTO.getLastName( ) ) ) );
-        
+
         doc.add( new StringField( AppointmentSearchItem.FIELD_LAST_NAME_SEARCH, appointmentDTO.getLastName( ).toLowerCase( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_LAST_NAME_SEARCH, new BytesRef( appointmentDTO.getLastName( ).toLowerCase( ) ) ) );
 
         // --- Mail
         doc.add( new StringField( AppointmentSearchItem.FIELD_MAIL, appointmentDTO.getEmail( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_MAIL, new BytesRef( appointmentDTO.getEmail( ) ) ) );
-        
+
         doc.add( new StringField( AppointmentSearchItem.FIELD_MAIL_SEARCH, appointmentDTO.getEmail( ).toLowerCase( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_MAIL_SEARCH, new BytesRef( appointmentDTO.getEmail( ).toLowerCase( ) ) ) );
 
@@ -302,7 +302,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         doc.add( new LongPoint( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
         doc.add( new StoredField( AppointmentSearchItem.FIELD_DATE_APPOINTMENT_TAKEN, longAppointmentTaken ) );
-        
+
         // -- Category
         doc.add( new IntPoint( AppointmentSearchItem.FIELD_ID_CATEGORY, idCategory ) );
         doc.add( new NumericDocValuesField( AppointmentSearchItem.FIELD_ID_CATEGORY, idCategory ) );

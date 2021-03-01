@@ -249,7 +249,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         }
         return refListForms;
     }
-    
+
     private ReferenceList getListCategories( )
     {
         ReferenceList refListForms = new ReferenceList( );
@@ -262,7 +262,6 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         }
         return refListForms;
     }
-    
 
     /**
      * List of all the available status of an appointment
