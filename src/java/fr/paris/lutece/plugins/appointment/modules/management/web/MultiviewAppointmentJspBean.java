@@ -184,7 +184,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
             defaultColumnList = Arrays.asList( request.getParameterValues( PARAMETER_SELECTED_DEFAULT_FIELD ) );
         }
 
-        ExcelAppointmentGenerator generator = new ExcelAppointmentGenerator( "-1", defaultColumnList, locale, listAppointmentsDTO, new ArrayList<>( ) );
+        ExcelAppointmentGenerator generator = new ExcelAppointmentGenerator( defaultColumnList, locale, listAppointmentsDTO, new ArrayList<>( ) );
 
         TemporaryFileGeneratorService.getInstance( ).generateFile( generator, getUser( ) );
         addInfo( "appointment.export.async.message", locale );
