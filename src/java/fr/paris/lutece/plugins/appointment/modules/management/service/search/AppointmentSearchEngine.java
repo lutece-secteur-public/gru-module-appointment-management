@@ -62,8 +62,8 @@ import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 
 import fr.paris.lutece.plugins.appointment.modules.management.business.search.AppointmentSearchItem;
+import fr.paris.lutece.plugins.appointment.modules.management.business.search.MultiviewFilter;
 import fr.paris.lutece.plugins.appointment.modules.management.service.indexer.LuceneAppointmentIndexFactory;
-import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFilterDTO;
 import fr.paris.lutece.portal.service.search.LuceneSearchEngine;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
@@ -74,7 +74,7 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
     private LuceneAppointmentIndexFactory _indexFactory;
 
     @Override
-    public int getSearchResult( List<AppointmentSearchItem> result, AppointmentFilterDTO filter, int nStartIndex, int nPageSize,
+    public int getSearchResult( List<AppointmentSearchItem> result, MultiviewFilter filter, int nStartIndex, int nPageSize,
             AppointmentSortConfig sortConfig )
     {
         int nbResults = 0;
@@ -116,9 +116,14 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         return nbResults;
     }
 
-    private Query createQuery( AppointmentFilterDTO filter )
+    private Query createQuery( MultiviewFilter filter )
     {
         BooleanQuery.Builder builder = new BooleanQuery.Builder( );
+        if ( filter.getIdCategory( ) > 0 )
+        {
+            Query query = IntPoint.newExactQuery( AppointmentSearchItem.FIELD_ID_CATEGORY, filter.getIdCategory( ) );
+            builder.add( query, BooleanClause.Occur.MUST );
+        }
         if ( filter.getIdForm( ) > 0 )
         {
             Query query = IntPoint.newExactQuery( AppointmentSearchItem.FIELD_ID_FORM, filter.getIdForm( ) );
@@ -149,7 +154,7 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
         return builder.build( );
     }
 
-    private Query createDateRangeQuery( AppointmentFilterDTO filter )
+    private Query createDateRangeQuery( MultiviewFilter filter )
     {
         Query query = null;
         Timestamp startingTimestamp = null;

@@ -48,9 +48,9 @@ import fr.paris.lutece.plugins.appointment.business.category.CategoryHome;
 import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.form.FormHome;
 import fr.paris.lutece.plugins.appointment.modules.management.business.search.AppointmentSearchItem;
+import fr.paris.lutece.plugins.appointment.modules.management.business.search.MultiviewFilter;
 import fr.paris.lutece.plugins.appointment.modules.management.service.search.AppointmentSearchEngine;
 import fr.paris.lutece.plugins.appointment.modules.management.service.search.AppointmentSortConfig;
-import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFilterDTO;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
 import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
@@ -66,7 +66,7 @@ public class AppointmentSearchService implements IAppointmentSearchService
     private StateService _stateService;
 
     @Override
-    public int search( List<AppointmentSearchItem> results, AppointmentFilterDTO filter, int nStartIndex, int nPageSize, AppointmentSortConfig sortConfig )
+    public int search( List<AppointmentSearchItem> results, MultiviewFilter filter, int nStartIndex, int nPageSize, AppointmentSortConfig sortConfig )
     {
         int nbResults = _searchEngine.getSearchResult( results, filter, nStartIndex, nPageSize, sortConfig );
         Map<Integer, Form> mapForms = FormHome.findAllForms( ).stream( ).collect( Collectors.toMap( Form::getIdForm, Function.identity( ) ) );

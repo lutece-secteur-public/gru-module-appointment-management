@@ -44,9 +44,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import fr.paris.lutece.plugins.appointment.business.category.Category;
+import fr.paris.lutece.plugins.appointment.business.category.CategoryHome;
 import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.form.FormHome;
 import fr.paris.lutece.plugins.appointment.modules.management.business.search.AppointmentSearchItem;
+import fr.paris.lutece.plugins.appointment.modules.management.business.search.MultiviewFilter;
 import fr.paris.lutece.plugins.appointment.modules.management.service.AppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.IAppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.search.AppointmentSortConfig;
@@ -54,7 +57,6 @@ import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.export.AppointmentExportService;
 import fr.paris.lutece.plugins.appointment.service.export.ExcelAppointmentGenerator;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
-import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFilterDTO;
 import fr.paris.lutece.plugins.filegenerator.service.TemporaryFileGeneratorService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -104,6 +106,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
     private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
     private static final String MARK_LIST_STATUS = "listStatus";
     private static final String MARK_LIST_FORMS = "listForms";
+    private static final String MARK_LIST_CATEGORIES = "listCategories";
     private static final String MARK_FILTER = "filter";
     private static final String MARK_LANGUAGE = "language";
     private static final String MARK_DEFAULT_FIELD_LIST = "defaultFieldList";
@@ -113,7 +116,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
     private String _strCurrentPageIndex;
     private int _nItemsPerPage;
     private AppointmentSortConfig _sortConfig;
-    private AppointmentFilterDTO _filter;
+    private MultiviewFilter _filter;
 
     /**
      * Return the view with the responses of all the appointments
@@ -132,11 +135,12 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         {
             // Populate the filter
             populate( _filter, request );
+            _strCurrentPageIndex = "1";
         }
         else
             if ( request.getParameter( PARAMETER_RESET ) != null || _filter == null )
             {
-                _filter = new AppointmentFilterDTO( );
+                _filter = new MultiviewFilter( );
             }
 
         List<AppointmentSearchItem> appointmentList = new ArrayList<>( );
@@ -152,6 +156,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         model.put( MARK_FILTER, _filter );
         model.put( MARK_LANGUAGE, getLocale( ) );
         model.put( MARK_LIST_FORMS, getListForms( ) );
+        model.put( MARK_LIST_CATEGORIES, getListCategories( ) );
         model.put( MARK_DEFAULT_FIELD_LIST, AppointmentExportService.getDefaultColumnList( getLocale( ) ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MULTIVIEW_APPOINTMENTS, TEMPLATE_MULTIVIEW_APPOINTMENT, model );
@@ -244,6 +249,20 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         }
         return refListForms;
     }
+    
+    private ReferenceList getListCategories( )
+    {
+        ReferenceList refListForms = new ReferenceList( );
+        refListForms.addItem( -1, StringUtils.EMPTY );
+
+        List<Category> categoryList = CategoryHome.findAllCategories( );
+        for ( Category category : categoryList )
+        {
+            refListForms.addItem( category.getIdCategory( ), category.getLabel( ) );
+        }
+        return refListForms;
+    }
+    
 
     /**
      * List of all the available status of an appointment
