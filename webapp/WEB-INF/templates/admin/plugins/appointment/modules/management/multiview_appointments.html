@@ -10,8 +10,8 @@
 			</@div>
 			<@fieldSet legend='#i18n{appointment.manageAppointments.labelSearch}' fieldsetId='searchAppointment'>
 				<@row>
-					<@columns sm=3>
-						<@formGroup labelFor='idForm' labelKey='#i18n{module.appointment.management.manageAppointments.columnFormTitle}'>
+					<@columns sm=6>
+						<@formGroup labelFor='idForm' labelKey='#i18n{module.appointment.management.multiview.columnFormTitle}'>
 							<@select name='idForm' id='idForm' items=listForms default_value='${filter.idForm!}' />
 						</@formGroup>
 					</@columns>
