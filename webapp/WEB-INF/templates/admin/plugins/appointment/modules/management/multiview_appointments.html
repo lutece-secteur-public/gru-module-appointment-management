@@ -47,7 +47,7 @@
 					<@columns sm=3>
 						<@formGroup labelFor='startingDateOfSearch' labelKey='#i18n{appointment.manageAppointments.startingDateOfSearch}'>
 							<@inputGroup>
-								<@input type='text' name='startingDateOfSearch' id='startingDateOfSearch' value='${filter.startingDateOfSearch!}' />
+								<@input type='date' name='startingDateOfSearch' id='startingDateOfSearch' value='${filter.startingDateOfSearch!}' />
 								<@inputGroupItem type='text'>
 									<@icon style='calendar' />
 								</@inputGroupItem>
@@ -67,7 +67,7 @@
 					<@columns sm=3>
 						<@formGroup labelFor='endingDateOfSearch' labelKey='#i18n{appointment.manageAppointments.endingDateOfSearch}'>
 							<@inputGroup>
-								<@input type='text' name='endingDateOfSearch' id='endingDateOfSearch' value='${filter.endingDateOfSearch!}' />
+								<@input type='date' name='endingDateOfSearch' id='endingDateOfSearch' value='${filter.endingDateOfSearch!}' />
 								<@inputGroupItem type='text'>
 									<@icon style='calendar' />
 								</@inputGroupItem>
@@ -165,35 +165,15 @@
 <script src="js/plugins/appointment/moment.min.js" ></script>
 <script src="js/plugins/appointment/bootstrap-datetimepicker.min.js"></script>
 <link rel='stylesheet' href='css/plugins/appointment/bootstrap-datetimepicker.css' >
-<@getDatePickerBootstrap idField="dateAppointment" language=language />
 <script type="text/javascript">
-	$('#startingTimeOfSearch').datetimepicker({
-        format: 'HH:mm',
-        stepping: 1
-    });
-    $('#endingTimeOfSearch').datetimepicker({
-        format: 'HH:mm',
-        stepping: 1
-    });
-    $('#allCheck').click(function() {
-        var etat = this.checked;
-        $("input[name='apmt']").each(function() {
-            this.checked = etat;
+    $(function () {
+        $('#startingTimeOfSearch').datetimepicker({
+            format: 'HH:mm',
+            stepping: 1
         });
-        $('#eraseAll').prop("disabled", !etat);
+        $('#endingTimeOfSearch').datetimepicker({
+            format: 'HH:mm',
+            stepping: 1
+        });
     });
-    $('#startingDateOfSearch').datepicker({
-        language : "${language}",
-        weekStart : 1,
-        todayBtn : true,
-        todayHighLight : true,
-        autoclose : true
-    });
-    $('#endingDateOfSearch').datepicker({
-        language : "${language}",
-        weekStart : 1,
-        todayBtn : true,
-        todayHighLight : true,
-        autoclose : true
-    });    
 </script>
