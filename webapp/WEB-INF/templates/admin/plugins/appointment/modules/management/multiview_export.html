@@ -2,11 +2,11 @@
 	<@tform name='export_form' id='export_form' action='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp'>
 		<@modalHeader modalTitle='#i18n{appointment.export.modal.title}' />
 		<@modalBody>
-			<@formGroup>
-				<#list defaultFieldList as defaultField>
-					<@checkBox name='selectedDefaultFieldList' id='selectedDefaultFieldList' value=defaultField.code labelKey=defaultField.name checked=true /> 
-				</#list>
-			</@formGroup>
+			<#assign cpt=1>
+			<#list defaultFieldList as defaultField>
+				<@checkBox name='selectedDefaultFieldList' id="defaultField_${cpt}" value=defaultField.code labelKey=defaultField.name checked=true />
+				 <#assign cpt=cpt+1>
+			</#list>
 		</@modalBody>
 		<@modalFooter>
 	        <@button type='cancel' title='#i18n{appointment.export.modal.button.ko}' params='data-dismiss="modal"'  />
