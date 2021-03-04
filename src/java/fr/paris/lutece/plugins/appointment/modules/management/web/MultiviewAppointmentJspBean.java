@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -71,6 +72,7 @@ import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.web.util.LocalizedDelegatePaginator;
+import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 
@@ -146,6 +148,9 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
             {
                 _filter = new MultiviewFilter( );
             }
+        
+        ReferenceList formList = getListForms( getUser( ) );
+        _filter.setIdFormList( formList.stream( ).map( ReferenceItem::getCode ).map( Integer::parseInt ).collect( Collectors.toList( ) ) );
 
         List<AppointmentSearchItem> appointmentList = new ArrayList<>( );
         int nbResults = _appointmentSearchService.search( appointmentList, _filter, getIndexStart( ), _nItemsPerPage, _sortConfig );
@@ -159,7 +164,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         model.put( MARK_LIST_STATUS, getListStatus( ) );
         model.put( MARK_FILTER, _filter );
         model.put( MARK_LANGUAGE, getLocale( ) );
-        model.put( MARK_LIST_FORMS, getListForms( getUser( ) ) );
+        model.put( MARK_LIST_FORMS, formList );
         model.put( MARK_LIST_CATEGORIES, getListCategories( ) );
         model.put( MARK_DEFAULT_FIELD_LIST, AppointmentExportService.getDefaultColumnList( getLocale( ) ) );
 

@@ -128,6 +128,11 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
             Query query = IntPoint.newExactQuery( AppointmentSearchItem.FIELD_ID_FORM, filter.getIdForm( ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
+        else
+        {
+            Query query = IntPoint.newSetQuery( AppointmentSearchItem.FIELD_ID_FORM, filter.getIdFormList( ) );
+            builder.add( query, BooleanClause.Occur.MUST );
+        }
         if ( StringUtils.isNotEmpty( filter.getFirstName( ) ) )
         {
             Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH,

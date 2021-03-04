@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.appointment.modules.management.business.search;
 
+import java.util.List;
+
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFilterDTO;
 
 public class MultiviewFilter extends AppointmentFilterDTO
@@ -40,6 +42,8 @@ public class MultiviewFilter extends AppointmentFilterDTO
     private static final long serialVersionUID = -6620743544234376592L;
 
     private int _nIdCategory;
+    
+    private List<Integer> _idFormList;
 
     /**
      * @return the nIdCategory
@@ -56,6 +60,22 @@ public class MultiviewFilter extends AppointmentFilterDTO
     public void setIdCategory( int nIdCategory )
     {
         _nIdCategory = nIdCategory;
+    }
+
+    /**
+     * @return the idFormList
+     */
+    public List<Integer> getIdFormList( )
+    {
+        return _idFormList;
+    }
+
+    /**
+     * @param idFormList the idFormList to set
+     */
+    public void setIdFormList( List<Integer> idFormList )
+    {
+        _idFormList = idFormList;
     }
 
 }
