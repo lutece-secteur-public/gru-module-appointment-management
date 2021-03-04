@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.appointment.business.category.Category;
 import fr.paris.lutece.plugins.appointment.business.category.CategoryHome;
 import fr.paris.lutece.plugins.appointment.business.form.Form;
@@ -53,6 +54,7 @@ import fr.paris.lutece.plugins.appointment.modules.management.business.search.Mu
 import fr.paris.lutece.plugins.appointment.modules.management.service.AppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.IAppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.search.AppointmentSortConfig;
+import fr.paris.lutece.plugins.appointment.service.AppointmentResourceIdService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.export.AppointmentExportService;
 import fr.paris.lutece.plugins.appointment.service.export.ExcelAppointmentGenerator;
@@ -60,8 +62,10 @@ import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
 import fr.paris.lutece.plugins.filegenerator.service.TemporaryFileGeneratorService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
@@ -155,7 +159,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         model.put( MARK_LIST_STATUS, getListStatus( ) );
         model.put( MARK_FILTER, _filter );
         model.put( MARK_LANGUAGE, getLocale( ) );
-        model.put( MARK_LIST_FORMS, getListForms( ) );
+        model.put( MARK_LIST_FORMS, getListForms( getUser( ) ) );
         model.put( MARK_LIST_CATEGORIES, getListCategories( ) );
         model.put( MARK_DEFAULT_FIELD_LIST, AppointmentExportService.getDefaultColumnList( getLocale( ) ) );
 
@@ -237,12 +241,15 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         return ( getCurrentPageIndex( ) - 1 ) * _nItemsPerPage;
     }
 
-    private ReferenceList getListForms( )
+    private ReferenceList getListForms( User user )
     {
         ReferenceList refListForms = new ReferenceList( );
         refListForms.addItem( -1, StringUtils.EMPTY );
 
         List<Form> formList = FormHome.findAllForms( );
+        formList = (List<Form>) AdminWorkgroupService.getAuthorizedCollection( formList, user );
+        formList = (List<Form>) RBACService.getAuthorizedCollection( formList, AppointmentResourceIdService.PERMISSION_VIEW_FORM, user );
+        
         for ( Form form : formList )
         {
             refListForms.addItem( form.getIdForm( ), form.getTitle( ) );
