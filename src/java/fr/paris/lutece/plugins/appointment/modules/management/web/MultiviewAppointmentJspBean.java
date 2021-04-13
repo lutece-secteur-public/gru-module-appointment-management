@@ -189,7 +189,13 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         List<AppointmentDTO> listAppointmentsDTO = new ArrayList<>( );
         if ( _filter != null )
         {
-            listAppointmentsDTO = AppointmentService.findListAppointmentsDTOByFilter( _filter );
+            List<AppointmentSearchItem> appointmentList = new ArrayList<>( );
+            _appointmentSearchService.search( appointmentList, _filter, 0, 0, _sortConfig );
+            
+            for ( AppointmentSearchItem item : appointmentList )
+            {
+                listAppointmentsDTO.add( AppointmentService.buildAppointmentDTOFromIdAppointment( item.getIdAppointment( ) ) );
+            }
         }
 
         List<String> defaultColumnList = new ArrayList<>( );
