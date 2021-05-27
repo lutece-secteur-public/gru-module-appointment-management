@@ -55,7 +55,7 @@
 
     <properties>
         <componentName>appointment-management</componentName>
-        <jiraProjectName>APPOINTMENTMANAGEMENT</jiraProjectName>
+        <jiraProjectName>APPMAN</jiraProjectName>
         <jiraComponentId></jiraComponentId>
     </properties>
     <scm>
