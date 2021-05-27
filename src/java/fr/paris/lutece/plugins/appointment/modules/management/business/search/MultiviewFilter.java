@@ -42,7 +42,7 @@ public class MultiviewFilter extends AppointmentFilterDTO
     private static final long serialVersionUID = -6620743544234376592L;
 
     private int _nIdCategory;
-    
+
     private List<Integer> _idFormList;
 
     /**
@@ -71,7 +71,8 @@ public class MultiviewFilter extends AppointmentFilterDTO
     }
 
     /**
-     * @param idFormList the idFormList to set
+     * @param idFormList
+     *            the idFormList to set
      */
     public void setIdFormList( List<Integer> idFormList )
     {

@@ -148,7 +148,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
             {
                 _filter = new MultiviewFilter( );
             }
-        
+
         ReferenceList formList = getListForms( getUser( ) );
         _filter.setIdFormList( formList.stream( ).map( ReferenceItem::getCode ).map( Integer::parseInt ).collect( Collectors.toList( ) ) );
 
@@ -191,7 +191,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         {
             List<AppointmentSearchItem> appointmentList = new ArrayList<>( );
             _appointmentSearchService.search( appointmentList, _filter, 0, 0, _sortConfig );
-            
+
             for ( AppointmentSearchItem item : appointmentList )
             {
                 listAppointmentsDTO.add( AppointmentService.buildAppointmentDTOFromIdAppointment( item.getIdAppointment( ) ) );
@@ -260,7 +260,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         List<Form> formList = FormHome.findAllForms( );
         formList = (List<Form>) AdminWorkgroupService.getAuthorizedCollection( formList, user );
         formList = (List<Form>) RBACService.getAuthorizedCollection( formList, AppointmentResourceIdService.PERMISSION_VIEW_FORM, user );
-        
+
         for ( Form form : formList )
         {
             refListForms.addItem( form.getIdForm( ), form.getTitle( ) );
