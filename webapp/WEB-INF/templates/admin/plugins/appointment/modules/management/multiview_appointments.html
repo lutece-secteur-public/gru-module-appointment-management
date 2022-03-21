@@ -144,7 +144,7 @@
 						<@td>${appointment.dateOfTheAppointment} #i18n{appointment.labelFrom} ${appointment.startingTime} #i18n{appointment.labelTo} ${appointment.endingTime}</@td>
 						<@td>
 							<#if appointment.cancelled>
-								<@tag color='important'>#i18n{appointment.message.labelStatusUnreserved}</@tag>
+								<@tag color='danger'>#i18n{appointment.message.labelStatusUnreserved}</@tag>
 							<#else>
 								<@tag color='success'>#i18n{appointment.message.labelStatusReserved}</@tag>
 							</#if>
