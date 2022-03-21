@@ -51,6 +51,7 @@ import javax.inject.Inject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.NumericDocValuesField;
@@ -90,6 +91,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
 {
 
     private static final String APPOINTMENTS = "appointments";
+    private static final String SUFIX_UID_APPOINTMENTS = "_appointment";
     private static final String INDEXER_NAME = "AppointmentIndexer";
     private static final String INDEXER_DESCRIPTION = "Indexer service for appointment";
     private static final String INDEXER_VERSION = "1.0.0";
@@ -221,13 +223,17 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
      */
     private Document getDocument( AppointmentDTO appointmentDTO, State appointmentState, int idCategory )
     {
+    	
+    	 FieldType ftNotStored = new FieldType( StringField.TYPE_NOT_STORED );
+         ftNotStored.setOmitNorms( false );
+         ftNotStored.setTokenized( false );
         // make a new, empty document
         Document doc = new Document( );
 
         int nIdAppointment = appointmentDTO.getIdAppointment( );
 
         // --- document identifier
-        doc.add( new StringField( SearchItem.FIELD_UID, String.valueOf( nIdAppointment ), Field.Store.YES ) );
+        doc.add( new Field( SearchItem.FIELD_UID, nIdAppointment + SUFIX_UID_APPOINTMENTS , ftNotStored ) );
 
         // --- form response identifier
         doc.add( new IntPoint( AppointmentSearchItem.FIELD_ID_APPOINTMENT, nIdAppointment ) );
