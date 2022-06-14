@@ -1,4 +1,6 @@
 <#include "/admin/plugins/appointment/modules/management/multiview_export.html" />
+<#include "/admin/plugins/appointment/appointment_commons.html" />
+<@commonsAppJS />
 <@messages errors=errors warnings=warnings infos=infos />
 <@row>
     <@columns>
@@ -24,29 +26,29 @@
 							</@columns>
 						</@row>
 						<@row>
-							<@columns sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='lastName' labelKey='#i18n{appointment.manageAppointments.columnLastName}' rows=2>
 									<@input type='text' id='lastName' name='lastName' value='${filter.lastName!}' />
 								</@formGroup>
 							</@columns>
-							<@columns sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='firstName' labelKey='#i18n{appointment.manageAppointments.columnFirstName}' rows=2>
 									<@input type='text' id='firstName' name='firstName' value='${filter.firstName!}'/>
 								</@formGroup>
 							</@columns>
-							<@columns  sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='email' labelKey='#i18n{appointment.manageAppointments.columnEmail}' rows=2>
 									<@input type='text' id='email' name='email' value='${filter.email!}' />
 								</@formGroup>
 							</@columns>
-							<@columns sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='status' labelKey='#i18n{appointment.labelStatus}' rows=2>
 									<@select name='status' id='status' items=listStatus default_value='${filter.status!}' />
 								</@formGroup>
 							</@columns>
 						</@row>
 						<@row>
-							<@columns sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='startingDateOfSearch' labelKey='#i18n{appointment.manageAppointments.startingDateOfSearch}' rows=2>
 									<@inputGroup>
 										<@input type='date' name='startingDateOfSearch' id='startingDateOfSearch' value='${filter.startingDateOfSearch!}' language=language />
@@ -56,7 +58,7 @@
 									</@inputGroup>
 								</@formGroup>
 							</@columns>
-							<@columns sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='startingTimeOfSearch' labelKey='#i18n{appointment.labelTo}' rows=2>
 									<@inputGroup>
 										<@input type='time' name='startingTimeOfSearch' id='startingTimeOfSearch' value='${filter.startingTimeOfSearch!\'\'}' />
@@ -66,7 +68,7 @@
 									</@inputGroup>
 								</@formGroup>
 							</@columns>
-							<@columns sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='endingDateOfSearch' labelKey='#i18n{appointment.manageAppointments.endingDateOfSearch}' rows=2>
 									<@inputGroup>
 										<@input type='date' name='endingDateOfSearch' id='endingDateOfSearch' value='${filter.endingDateOfSearch!}' />
@@ -76,7 +78,7 @@
 									</@inputGroup>
 								</@formGroup>
 							</@columns>
-							<@columns sm=3>
+							<@columns md=3>
 								<@formGroup labelFor='endingTimeOfSearch' labelKey='#i18n{appointment.labelTo}' rows=2>
 									<@inputGroup>
 										<@input type='time' name='endingTimeOfSearch' id='endingTimeOfSearch' value='${filter.endingTimeOfSearch!\'\'}' />
@@ -86,6 +88,9 @@
 									</@inputGroup>
 								</@formGroup>
 							</@columns>
+						</@row>
+						<@row id='error_messages_container' params='style="display:none;"'>
+							<@alert color='danger' id='error_message'></@alert>
 						</@row>
 						<@formGroup rows=2 params='style="margin-top:1.5rem;"'>
 							<@actionButtons button1Name='Search' i18nValue1Key='appointment.manageAppointments.labelSearch' icon1='fas fa-search' button2Name='Reset' i18nValue2Key='appointment.displayAppointmentForm.labelReset' url2='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=view_manage_appointments&reset=\'true\'' icon2='fas fa-redo' />
@@ -162,3 +167,26 @@
 		</@box>
 	</@columns>
 </@row>
+
+<script>
+	// Click on validation button events
+	$( '[name="Search"]' ).click( function(e){
+		dStart=$('#startingDateOfSearch').val(),dEnd=$('#endingDateOfSearch').val();
+		tStart=$('#startingTimeOfSearch').val(),tEnd=$('#endingTimeOfSearch').val();		
+		var startDateAndTime = moment(dStart + ' ' + tStart, 'YYYY-MM-DD HH:mm');
+		var endDateAndTime = moment(dEnd + ' ' + tEnd, 'YYYY-MM-DD HH:mm');
+		
+		if( moment(endDateAndTime).isBefore( startDateAndTime )) {
+			alert("test");
+			$('#error_message').html('La date de fin ne peut être antérieure à la date de début !');
+			$('#error_messages_container').css('display','block');
+			e.preventDefault();
+		}
+		
+		if ((moment(endDateAndTime).isSame( startDateAndTime )) && ($('#startingTimeOfSearch').val() != '00:00') && ($('#endingTimeOfSearch').val() != '00:00'))  {
+			$('#error_message').html('La date de fin ne peut être égale à la date de début !');
+			$('#error_messages_container').css('display','block');
+			e.preventDefault();
+		}
+	});
+</script>
