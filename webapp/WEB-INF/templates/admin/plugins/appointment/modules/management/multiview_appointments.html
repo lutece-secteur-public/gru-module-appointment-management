@@ -177,7 +177,6 @@
 		var endDateAndTime = moment(dEnd + ' ' + tEnd, 'YYYY-MM-DD HH:mm');
 		
 		if( moment(endDateAndTime).isBefore( startDateAndTime )) {
-			alert("test");
 			$('#error_message').html('La date de fin ne peut être antérieure à la date de début !');
 			$('#error_messages_container').css('display','block');
 			e.preventDefault();
