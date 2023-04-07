@@ -26,22 +26,27 @@
 							</@columns>
 						</@row>
 						<@row>
-							<@columns md=3>
+							<@columns class='col-md'>
 								<@formGroup labelFor='lastName' labelKey='#i18n{appointment.manageAppointments.columnLastName}' rows=2>
 									<@input type='text' id='lastName' name='lastName' value='${filter.lastName!}' />
 								</@formGroup>
 							</@columns>
-							<@columns md=3>
+							<@columns class='col-md'>
 								<@formGroup labelFor='firstName' labelKey='#i18n{appointment.manageAppointments.columnFirstName}' rows=2>
 									<@input type='text' id='firstName' name='firstName' value='${filter.firstName!}'/>
 								</@formGroup>
 							</@columns>
-							<@columns md=3>
+							<@columns class='col-md'>
 								<@formGroup labelFor='email' labelKey='#i18n{appointment.manageAppointments.columnEmail}' rows=2>
 									<@input type='text' id='email' name='email' value='${filter.email!}' />
 								</@formGroup>
 							</@columns>
-							<@columns md=3>
+							<@columns class='col-md'>
+								<@formGroup labelFor='phoneNumber' labelKey='#i18n{appointment.manageAppointments.columnPhoneNumber}'  rows=2>
+									<@input type='text' id='phoneNumber' name='phoneNumber' value='${filter.phoneNumber!}' />
+								</@formGroup>
+							</@columns>
+							<@columns class='col-md'>
 								<@formGroup labelFor='status' labelKey='#i18n{appointment.labelStatus}' rows=2>
 									<@select name='status' id='status' items=listStatus default_value='${filter.status!}' />
 								</@formGroup>
@@ -120,6 +125,10 @@
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=mail&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=mail&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
 						</@th>
+						<@th>#i18n{appointment.manageAppointments.columnPhoneNumber}
+							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=phone_number&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
+							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=phone_number&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
+						</@th>
 						<@th>#i18n{appointment.manageAppointments.columnNbBookedSeats}
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=nb_seats_int&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=nb_seats_int&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
@@ -145,6 +154,7 @@
 								<@td>${appointment.lastName}</@td>
 								<@td>${appointment.firstName}</@td>
 								<@td>${appointment.mail}</@td>
+								<@td>${appointment.phoneNumber!}</@td>
 								<@td>${appointment.nbSeats}</@td>
 								<@td>${appointment.dateOfTheAppointment} #i18n{appointment.labelFrom} ${appointment.startingTime} #i18n{appointment.labelTo} ${appointment.endingTime}</@td>
 								<@td>

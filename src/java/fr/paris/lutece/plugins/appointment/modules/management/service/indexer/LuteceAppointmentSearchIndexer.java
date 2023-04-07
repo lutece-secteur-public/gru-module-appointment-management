@@ -252,7 +252,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         doc.add( new StringField( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, appointmentDTO.getFirstName( ).toLowerCase( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_FIRST_NAME_SEARCH, new BytesRef( appointmentDTO.getFirstName( ).toLowerCase( ) ) ) );
 
-        // --- First name
+        // --- Last name
         doc.add( new StringField( AppointmentSearchItem.FIELD_LAST_NAME, appointmentDTO.getLastName( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_LAST_NAME, new BytesRef( appointmentDTO.getLastName( ) ) ) );
 
@@ -265,6 +265,15 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
 
         doc.add( new StringField( AppointmentSearchItem.FIELD_MAIL_SEARCH, appointmentDTO.getEmail( ).toLowerCase( ), Field.Store.YES ) );
         doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_MAIL_SEARCH, new BytesRef( appointmentDTO.getEmail( ).toLowerCase( ) ) ) );
+        
+        // --- Phone Number
+        // A User's phone number can be null in DB, so we make sure this variable is always initialized with a value
+        String phoneNumber = appointmentDTO.getPhoneNumber( ) != null ? appointmentDTO.getPhoneNumber( ) : "";
+        doc.add( new StringField( AppointmentSearchItem.FIELD_PHONE_NUMBER, phoneNumber, Field.Store.YES ) );
+        doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_PHONE_NUMBER, new BytesRef( phoneNumber ) ) );
+
+        doc.add( new StringField( AppointmentSearchItem.FIELD_PHONE_NUMBER_SEARCH, phoneNumber.toLowerCase( ), Field.Store.YES ) );
+        doc.add( new SortedDocValuesField( AppointmentSearchItem.FIELD_PHONE_NUMBER_SEARCH, new BytesRef( phoneNumber.toLowerCase( ) ) ) );
 
         // --- Starting date appointment
         Long longStartDate = Timestamp.valueOf( appointmentDTO.getStartingDateTime( ) ).getTime( );
