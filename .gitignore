@@ -1,8 +1,0 @@
-/target/
-/.classpath
-/.project
-/.settings
-/nbactions.xml
-/nb-configuration.xml
-/bin/
-webapp/WEB-INF/conf/db.properties
