@@ -151,6 +151,12 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
                     WildcardQuery.WILDCARD_STRING + filter.getEmail( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
             builder.add( query, BooleanClause.Occur.MUST );
         }
+        if ( StringUtils.isNotEmpty( filter.getPhoneNumber( ) ) )
+        {
+            Query query = new WildcardQuery( new Term( AppointmentSearchItem.FIELD_PHONE_NUMBER,
+                    WildcardQuery.WILDCARD_STRING + filter.getPhoneNumber( ).toLowerCase( ) + WildcardQuery.WILDCARD_STRING ) );
+            builder.add( query, BooleanClause.Occur.MUST );
+        }
         builder.add( createDateRangeQuery( filter ), BooleanClause.Occur.MUST );
         if ( filter.getStatus( ) != -1 )
         {

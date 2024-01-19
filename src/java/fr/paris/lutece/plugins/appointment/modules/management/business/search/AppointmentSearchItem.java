@@ -62,6 +62,7 @@ public class AppointmentSearchItem extends SearchItem
     public static final String FIELD_LAST_NAME_SEARCH = "last_name_search";
     public static final String FIELD_MAIL = "mail";
     public static final String FIELD_MAIL_SEARCH = "mail_search";
+    public static final String FIELD_PHONE_NUMBER = "phone_number";
     public static final String FIELD_START_DATE = "start_date";
     public static final String FIELD_END_DATE = "end_date";
     public static final String FIELD_ADMIN = "admin";
@@ -78,6 +79,7 @@ public class AppointmentSearchItem extends SearchItem
     private String _firstName;
     private String _lastName;
     private String _mail;
+    private String _phoneNumber;
     private LocalDateTime _startDate;
     private LocalDateTime _endDate;
     private String _admin;
@@ -106,6 +108,7 @@ public class AppointmentSearchItem extends SearchItem
         _lastName = document.get( AppointmentSearchItem.FIELD_LAST_NAME );
         _mail = document.get( AppointmentSearchItem.FIELD_MAIL );
         _startDate = parseDate( document.get( FIELD_START_DATE ) );
+        _phoneNumber = document.get( AppointmentSearchItem.FIELD_PHONE_NUMBER ) != null ? document.get( AppointmentSearchItem.FIELD_PHONE_NUMBER ) : "";
         _endDate = parseDate( document.get( FIELD_END_DATE ) );
         _admin = document.get( AppointmentSearchItem.FIELD_ADMIN );
         _cancelled = Boolean.valueOf( document.get( AppointmentSearchItem.FIELD_CANCELLED ) );
@@ -157,6 +160,14 @@ public class AppointmentSearchItem extends SearchItem
     public String getMail( )
     {
         return _mail;
+    }
+
+    /**
+     * @return the phone number
+     */
+    public String getPhoneNumber( )
+    {
+        return _phoneNumber;
     }
 
     /**
