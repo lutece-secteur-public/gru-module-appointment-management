@@ -233,14 +233,14 @@ public class AppointmentSearchEngine implements IAppointmentSearchEngine
             {
                 if ( strAttributeName.endsWith( AppointmentSearchItem.FIELD_DATE_SUFFIX ) )
                 {
-                    return new Sort( new SortedNumericSortField( sortConfig.getSortAttributeName( ), SortField.Type.LONG, sortConfig.isAscSort( ) ) );
+                    return new Sort( new SortedNumericSortField( sortConfig.getSortAttributeName( ), SortField.Type.LONG, sortConfig.isDescSort( ) ) );
                 }
                 if ( strAttributeName.endsWith( AppointmentSearchItem.FIELD_INT_SUFFIX ) )
                 {
-                    return new Sort( new SortedNumericSortField( sortConfig.getSortAttributeName( ), SortField.Type.LONG, sortConfig.isAscSort( ) ) );
+                    return new Sort( new SortedNumericSortField( sortConfig.getSortAttributeName( ), SortField.Type.LONG, sortConfig.isDescSort( ) ) );
 
                 }
-                return new Sort( new SortField( sortConfig.getSortAttributeName( ), SortField.Type.STRING, sortConfig.isAscSort( ) ) );
+                return new Sort( new SortField( sortConfig.getSortAttributeName( ), SortField.Type.STRING, sortConfig.isDescSort( ) ) );
             }
         }
 
