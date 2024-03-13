@@ -117,6 +117,8 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
     private static final String MARK_LANGUAGE = "language";
     private static final String MARK_DEFAULT_FIELD_LIST = "defaultFieldList";
 
+    private static final String START_DATE = "start_date";
+
     // Variables
     private IAppointmentSearchService _appointmentSearchService = SpringContextService.getBean( AppointmentSearchService.BEAN_NAME );
     private String _strCurrentPageIndex;
@@ -219,13 +221,23 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 50 );
         _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, nDefaultItemsPerPage );
 
-        String sortName = request.getParameter( PARAMETER_ORDER_BY );
-        String sortOrder = request.getParameter( PARAMETER_ORDER_ASC );
 
-        if ( StringUtils.isNotEmpty( sortName ) && StringUtils.isNotEmpty( sortOrder ) )
+        String sortName = request.getParameter( PARAMETER_ORDER_BY );
+        String sortOrderAsc = request.getParameter( PARAMETER_ORDER_ASC );
+
+        if ( StringUtils.isEmpty( sortName ) )
         {
-            _sortConfig = new AppointmentSortConfig( sortName, Boolean.valueOf( sortOrder ) );
+            sortName = START_DATE;
         }
+
+        boolean bDesc = Boolean.TRUE; //DEFAULT DESC ORDER
+        if ( StringUtils.isNotEmpty( sortOrderAsc ) )
+        {
+            bDesc = !Boolean.parseBoolean( sortOrderAsc );
+        }
+
+        _sortConfig = new AppointmentSortConfig( sortName, bDesc );
+
     }
 
     /**

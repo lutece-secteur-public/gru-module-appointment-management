@@ -36,12 +36,12 @@ package fr.paris.lutece.plugins.appointment.modules.management.service.search;
 public class AppointmentSortConfig
 {
     private final String _strSortAttributeName;
-    private final boolean _bAscSort;
+    private final boolean _bDescSort;
 
-    public AppointmentSortConfig( String strSortAttributeName, boolean bAscSort )
+    public AppointmentSortConfig( String strSortAttributeName, boolean bDescSort )
     {
         _strSortAttributeName = strSortAttributeName;
-        _bAscSort = bAscSort;
+        _bDescSort = bDescSort;
     }
 
     /**
@@ -53,10 +53,10 @@ public class AppointmentSortConfig
     }
 
     /**
-     * @return the bAscSort
+     * @return the bDescSort
      */
-    public boolean isAscSort( )
+    public boolean isDescSort( )
     {
-        return _bAscSort;
+        return _bDescSort;
     }
 }
