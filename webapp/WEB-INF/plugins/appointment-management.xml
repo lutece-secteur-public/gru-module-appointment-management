@@ -21,11 +21,11 @@
     <!-- Admin features parameters -->
     <admin-features>
         <admin-feature>
-            <feature-id>APPOINTMENT_SEARCH</feature-id>
-            <feature-title>module.appointment.management.adminFeature.AppointmentSearch.name</feature-title>
-            <feature-description>module.appointment.management.adminFeature.AppointmentSearch.description</feature-description>
+            <feature-id>MULTIVIEW_APPOINTMENT</feature-id>
+            <feature-title>module.appointment.management.adminFeature.MultiviewAppointment.name</feature-title>
+            <feature-description>module.appointment.management.adminFeature.MultiviewAppointment.description</feature-description>
             <feature-level>1</feature-level>
-            <feature-url>jsp/admin/plugins/appointment/modules/management/AppointmentSearch.jsp</feature-url>
+            <feature-url>jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp</feature-url>
             <feature-icon-url/>
         </admin-feature>
     </admin-features>
