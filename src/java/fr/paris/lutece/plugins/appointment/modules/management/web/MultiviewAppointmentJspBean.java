@@ -37,10 +37,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +54,6 @@ import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.form.FormHome;
 import fr.paris.lutece.plugins.appointment.modules.management.business.search.AppointmentSearchItem;
 import fr.paris.lutece.plugins.appointment.modules.management.business.search.MultiviewFilter;
-import fr.paris.lutece.plugins.appointment.modules.management.service.AppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.IAppointmentSearchService;
 import fr.paris.lutece.plugins.appointment.modules.management.service.search.AppointmentSortConfig;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResourceIdService;
@@ -64,19 +65,21 @@ import fr.paris.lutece.plugins.filegenerator.service.TemporaryFileGeneratorServi
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.portal.web.util.LocalizedDelegatePaginator;
 import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 
 @Controller( controllerJsp = "MultiviewAppointment.jsp", controllerPath = "jsp/admin/plugins/appointment/modules/management", right = "MULTIVIEW_APPOINTMENT" )
+@SessionScoped
+@Named
 public class MultiviewAppointmentJspBean extends MVCAdminJspBean
 {
     private static final long serialVersionUID = 2621411978305115179L;
@@ -120,7 +123,12 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
     private static final String START_DATE = "start_date";
 
     // Variables
-    private IAppointmentSearchService _appointmentSearchService = SpringContextService.getBean( AppointmentSearchService.BEAN_NAME );
+    @Inject
+    private IAppointmentSearchService _appointmentSearchService;
+    @Inject
+    private Models _models;
+    @Inject
+    private TemporaryFileGeneratorService _temporaryFileGeneratorService;
     private String _strCurrentPageIndex;
     private int _nItemsPerPage;
     private AppointmentSortConfig _sortConfig;
@@ -159,18 +167,17 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         LocalizedDelegatePaginator<AppointmentSearchItem> paginator = new LocalizedDelegatePaginator<>( appointmentList, _nItemsPerPage, JSP_MANAGE_APPOINTMENT,
                 PARAMETER_PAGE_INDEX, _strCurrentPageIndex, nbResults, getLocale( ) );
 
-        Map<String, Object> model = getModel( );
-        model.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
-        model.put( MARK_PAGINATOR, paginator );
-        model.put( MARK_APPOINTMENT_LIST, paginator.getPageItems( ) );
-        model.put( MARK_LIST_STATUS, getListStatus( ) );
-        model.put( MARK_FILTER, _filter );
-        model.put( MARK_LANGUAGE, getLocale( ) );
-        model.put( MARK_LIST_FORMS, formList );
-        model.put( MARK_LIST_CATEGORIES, getListCategories( ) );
-        model.put( MARK_DEFAULT_FIELD_LIST, AppointmentExportService.getDefaultColumnList( getLocale( ) ) );
+        _models.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
+        _models.put( MARK_PAGINATOR, paginator );
+        _models.put( MARK_APPOINTMENT_LIST, paginator.getPageItems( ) );
+        _models.put( MARK_LIST_STATUS, getListStatus( ) );
+        _models.put( MARK_FILTER, _filter );
+        _models.put( MARK_LANGUAGE, getLocale( ) );
+        _models.put( MARK_LIST_FORMS, formList );
+        _models.put( MARK_LIST_CATEGORIES, getListCategories( ) );
+        _models.put( MARK_DEFAULT_FIELD_LIST, AppointmentExportService.getDefaultColumnList( getLocale( ) ) );
 
-        return getPage( PROPERTY_PAGE_TITLE_MULTIVIEW_APPOINTMENTS, TEMPLATE_MULTIVIEW_APPOINTMENT, model );
+        return getPage( PROPERTY_PAGE_TITLE_MULTIVIEW_APPOINTMENTS, TEMPLATE_MULTIVIEW_APPOINTMENT, _models );
     }
 
     /**
@@ -208,7 +215,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
 
         ExcelAppointmentGenerator generator = new ExcelAppointmentGenerator( defaultColumnList, locale, listAppointmentsDTO, new ArrayList<>( ) );
 
-        TemporaryFileGeneratorService.getInstance( ).generateFile( generator, getUser( ) );
+        _temporaryFileGeneratorService.generateFile( generator, getUser( ) );
         addInfo( "appointment.export.async.message", locale );
 
         return getMultiviewAppointments( request );

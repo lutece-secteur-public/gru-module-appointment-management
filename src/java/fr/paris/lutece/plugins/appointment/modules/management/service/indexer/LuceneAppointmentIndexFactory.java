@@ -36,8 +36,9 @@ package fr.paris.lutece.plugins.appointment.modules.management.service.indexer;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DirectoryReader;
@@ -51,6 +52,7 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
+@ApplicationScoped
 public class LuceneAppointmentIndexFactory
 {
     // Constants

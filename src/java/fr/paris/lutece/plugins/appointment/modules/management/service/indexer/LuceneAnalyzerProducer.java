@@ -33,40 +33,40 @@
  */
 package fr.paris.lutece.plugins.appointment.modules.management.service.indexer;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import fr.paris.lutece.portal.service.util.AppLogService;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
-import jakarta.inject.Inject;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
-import fr.paris.lutece.plugins.appointment.service.event.AppointmentDateChangedEvent;
-import fr.paris.lutece.plugins.appointment.service.event.AppointmentEvent;
-import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
-import fr.paris.lutece.portal.service.event.EventAction;
-import fr.paris.lutece.portal.service.event.Type;
-
+/**
+ * CDI Producer for Lucene Analyzer
+ */
 @ApplicationScoped
-public class LuceneAppointmentListener
+public class LuceneAnalyzerProducer
 {
-
-    @Inject
-    private IAppointmentSearchIndexer _indexer;
-
-    public void onAppointmentCreated( @Observes @Type( EventAction.CREATE ) AppointmentEvent event )
+    @Produces
+    @Singleton
+    @Named( "appointment-management.luceneAnalizer" )
+    public Analyzer produceLuceneAnalyzer( @ConfigProperty( name = "appointment-management.search.lucene.analyser.className", defaultValue = "org.apache.lucene.analysis.standard.StandardAnalyzer" ) String strClassName )
     {
-        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_CREATE );
-    }
+        Analyzer analyzer;
 
-    public void onAppointmentUpdated( @Observes @Type( EventAction.UPDATE ) AppointmentEvent event )
-    {
-        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
-    }
+        try
+        {
+            analyzer = (Analyzer) Class.forName( strClassName ).getDeclaredConstructor( ).newInstance( );
+        }
+        catch ( Exception e )
+        {
+            AppLogService.error( "Failed to instantiate the analyzer of the type : {}", strClassName );
 
-    public void onAppointmentRemoved( @Observes @Type( EventAction.REMOVE ) AppointmentEvent event )
-    {
-        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_DELETE );
-    }
+            analyzer = new StandardAnalyzer( );
+        }
 
-    public void onAppointmentDateChanged( @Observes AppointmentDateChangedEvent event )
-    {
-        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
+        return analyzer;
     }
 }

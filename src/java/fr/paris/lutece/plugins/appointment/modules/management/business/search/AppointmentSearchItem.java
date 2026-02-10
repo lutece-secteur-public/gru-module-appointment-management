@@ -240,7 +240,7 @@ public class AppointmentSearchItem extends SearchItem
             }
             catch( NumberFormatException e )
             {
-                AppLogService.error( "Unable to convert " + strDocumentValue + " to integer." );
+                AppLogService.error( "Unable to convert {} to integer.", strDocumentValue );
             }
         }
         return nReturn;
