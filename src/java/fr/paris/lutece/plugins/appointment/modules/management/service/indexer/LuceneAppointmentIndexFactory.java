@@ -37,10 +37,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
-import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -58,10 +56,6 @@ public class LuceneAppointmentIndexFactory
     // Constants
     private static final String PATH_INDEX = "appointment-management.internalIndexer.lucene.indexPath";
     private static final String PATH_INDEX_IN_WEBAPP = "appointment-management.internalIndexer.lucene.indexInWebapp";
-
-    @Inject
-    @Named( value = "appointment-management.luceneAnalizer" )
-    private Analyzer _analyzer;
 
     private IndexWriter _indexWriter;
 
@@ -87,7 +81,7 @@ public class LuceneAppointmentIndexFactory
                     bCreateIndex = Boolean.TRUE;
                 }
 
-                IndexWriterConfig conf = new IndexWriterConfig( _analyzer );
+                IndexWriterConfig conf = new IndexWriterConfig( new StandardAnalyzer( ) );
 
                 if ( Boolean.TRUE.equals( bCreateIndex ) )
                 {
