@@ -1,9 +1,9 @@
-<jsp:useBean id="multiviewAppointmentAppointments" scope="session" class="fr.paris.lutece.plugins.appointment.modules.management.web.MultiviewAppointmentJspBean" />
-<% String strContent = multiviewAppointmentAppointments.processController ( request , response ); %>
-
 <%@ page errorPage="../../../../ErrorPage.jsp" %>
+
+${ pageContext.setAttribute( 'strContent', multiviewAppointmentJspBean.processController( pageContext.request , pageContext.response ) ) }
+
 <jsp:include page="../../../../AdminHeader.jsp" />
 
-<%= strContent %>
+${ pageContext.getAttribute( 'strContent' ) }
 
 <%@ include file="../../../../AdminFooter.jsp" %>

@@ -33,42 +33,40 @@
  */
 package fr.paris.lutece.plugins.appointment.modules.management.service.indexer;
 
-import java.util.List;
-import java.util.Locale;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 
-import javax.inject.Inject;
-
-import fr.paris.lutece.plugins.appointment.service.listeners.IAppointmentListener;
+import fr.paris.lutece.plugins.appointment.service.event.AppointmentDateChangedEvent;
+import fr.paris.lutece.plugins.appointment.service.event.AppointmentEvent;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
+import fr.paris.lutece.portal.service.event.EventAction;
+import fr.paris.lutece.portal.service.event.Type;
 
-public class LuceneAppointmentListener implements IAppointmentListener
+@ApplicationScoped
+public class LuceneAppointmentListener
 {
 
     @Inject
     private IAppointmentSearchIndexer _indexer;
 
-    @Override
-    public void notifyAppointmentRemoval( int nIdAppointment )
+    public void onAppointmentCreated( @Observes @Type( EventAction.CREATE ) AppointmentEvent event )
     {
-        _indexer.indexDocument( nIdAppointment, IndexerAction.TASK_DELETE );
+        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_CREATE );
     }
 
-    @Override
-    public String appointmentDateChanged( int nIdAppointment, List<Integer> listIdSlot, Locale locale )
+    public void onAppointmentUpdated( @Observes @Type( EventAction.UPDATE ) AppointmentEvent event )
     {
-        _indexer.indexDocument( nIdAppointment, IndexerAction.TASK_MODIFY );
-        return null;
+        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
     }
 
-    @Override
-    public void notifyAppointmentCreated( int nIdAppointment )
+    public void onAppointmentRemoved( @Observes @Type( EventAction.REMOVE ) AppointmentEvent event )
     {
-        _indexer.indexDocument( nIdAppointment, IndexerAction.TASK_CREATE );
+        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_DELETE );
     }
 
-    @Override
-    public void notifyAppointmentUpdated( int nIdAppointment )
+    public void onAppointmentDateChanged( @Observes AppointmentDateChangedEvent event )
     {
-        _indexer.indexDocument( nIdAppointment, IndexerAction.TASK_MODIFY );
+        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
     }
 }

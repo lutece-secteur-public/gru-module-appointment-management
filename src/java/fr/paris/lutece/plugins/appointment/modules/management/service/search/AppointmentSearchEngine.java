@@ -39,7 +39,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.document.Document;
@@ -67,6 +68,7 @@ import fr.paris.lutece.plugins.appointment.modules.management.service.indexer.Lu
 import fr.paris.lutece.portal.service.search.LuceneSearchEngine;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
+@ApplicationScoped
 public class AppointmentSearchEngine implements IAppointmentSearchEngine
 {
 

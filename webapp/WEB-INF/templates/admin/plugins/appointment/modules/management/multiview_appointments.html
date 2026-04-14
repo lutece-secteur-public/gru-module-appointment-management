@@ -1,13 +1,14 @@
 <#include "/admin/plugins/appointment/modules/management/multiview_export.html" />
 <#include "/admin/plugins/appointment/appointment_commons.html" />
 <@commonsAppJS />
-<@messages errors=errors warnings=warnings infos=infos />
-<@row>
-    <@columns>
+<@pageContainer>
+	<@pageColumn>
+		<@pageHeader title='#i18n{module.appointment.management.multiview.appointment.pageTitle}' />
+		<@messages errors=(errors![]) warnings=(warnings![]) infos=(infos![]) />
 		<@box>
 			<@boxHeader title=''>
 				<@button style='card-control collapse' buttonTargetId='#searchAppointment' title='#i18n{appointment.manageAppointments.labelSearch}' hideTitle=['xs','sm'] buttonIcon='search' size='sm' />
-				<@aButton params='data-toggle="modal" data-target="#export_modal"' buttonIcon='download' title='#i18n{appointment.permission.label.exportMassAppointment}' size='sm' />
+				<@aButton params='data-bs-toggle="modal" data-bs-target="#export_modal"' buttonIcon='download' title='#i18n{appointment.permission.label.exportMassAppointment}' size='sm' />
 			</@boxHeader>
 			<@boxBody>
 				<@tform name='form' id='form' action='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp'>
@@ -68,7 +69,7 @@
 									<@inputGroup>
 										<@input type='time' name='startingTimeOfSearch' id='startingTimeOfSearch' value='${filter.startingTimeOfSearch!\'\'}' />
 										<@inputGroupItem type='text'>
-											<@icon style='clock-o' />
+											<@icon style='clock' />
 										</@inputGroupItem>
 									</@inputGroup>
 								</@formGroup>
@@ -88,7 +89,7 @@
 									<@inputGroup>
 										<@input type='time' name='endingTimeOfSearch' id='endingTimeOfSearch' value='${filter.endingTimeOfSearch!\'\'}' />
 										<@inputGroupItem type='text'>
-											<@icon style='clock-o' />
+											<@icon style='clock' />
 										</@inputGroupItem>
 									</@inputGroup>
 								</@formGroup>
@@ -98,20 +99,20 @@
 							<@alert color='danger' id='error_message'></@alert>
 						</@row>
 						<@formGroup rows=2 params='style="margin-top:1.5rem;"'>
-							<@actionButtons button1Name='Search' i18nValue1Key='appointment.manageAppointments.labelSearch' icon1='fas fa-search' button2Name='Reset' i18nValue2Key='appointment.displayAppointmentForm.labelReset' url2='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=view_manage_appointments&reset=\'true\'' icon2='fas fa-redo' />
+							<@actionButtons button1Name='Search' i18nValue1Key='appointment.manageAppointments.labelSearch' icon1='search' button2Name='Reset' i18nValue2Key='appointment.displayAppointmentForm.labelReset' url2='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=view_manage_appointments&reset=\'true\'' icon2='refresh' />
 						</@formGroup>
 						<hr>
 					</@fieldSet>
 				</@tform>
-				
+
 				<#if appointment_list?? && appointment_list?size &gt; 0>
 					<@div align='right'>
 						<@paginationAdmin paginator=paginator />
 					</@div>
 					<@table>
-						<@th>#i18n{module.appointment.management.multiview.columnCategory} 
+						<@th>#i18n{module.appointment.management.multiview.columnCategory}
 						</@th>
-						<@th>#i18n{module.appointment.management.multiview.columnFormTitle} 
+						<@th>#i18n{module.appointment.management.multiview.columnFormTitle}
 						</@th>
 						<@th>#i18n{appointment.manageAppointments.columnLastName}
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=last_name&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
@@ -120,8 +121,8 @@
 						<@th>#i18n{appointment.manageAppointments.columnFirstName}
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=first_name&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=first_name&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
-						</@th>                                
-						<@th>#i18n{appointment.manageAppointments.columnEmail} 
+						</@th>
+						<@th>#i18n{appointment.manageAppointments.columnEmail}
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=mail&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=mail&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
 						</@th>
@@ -132,8 +133,8 @@
 						<@th>#i18n{appointment.manageAppointments.columnNbBookedSeats}
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=nb_seats_int&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=nb_seats_int&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
-						</@th> 
-						<@th>#i18n{appointment.dateAppointment.title} 
+						</@th>
+						<@th>#i18n{appointment.dateAppointment.title}
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=start_date&orderAsc=true' buttonIcon='chevron-up' size='xs' color='default' />
 							<@aButton href='jsp/admin/plugins/appointment/modules/management/MultiviewAppointment.jsp?view=multiview_appointments&orderBy=start_date&orderAsc=false' buttonIcon='chevron-down' size='xs' color='default' />
 						</@th>
@@ -144,9 +145,9 @@
 						<@th>#i18n{appointment.manageAppointments.columnState}
 						</@th>
 						<@th>#i18n{portal.util.labelActions}</@th>
-						
+
 						<@tableHeadBodySeparator />
-						
+
 						<#list appointment_list as appointment >
 							<@tr>
 								<@td>${appointment.categoryTitle}</@td>
@@ -175,21 +176,28 @@
 				<@paginationAdmin paginator=paginator combo=1 />
 			</@boxBody>
 		</@box>
-	</@columns>
-</@row>
+	</@pageColumn>
+</@pageContainer>
 
 <script>
 	// Click on validation button events
-	$( '[name="Search"]' ).click( function(e){
-		dStart=$('#startingDateOfSearch').val(),dEnd=$('#endingDateOfSearch').val();
-		tStart=$('#startingTimeOfSearch').val(),tEnd=$('#endingTimeOfSearch').val();		
-		var startDateAndTime = moment(dStart + ' ' + tStart, 'YYYY-MM-DD HH:mm');
-		var endDateAndTime = moment(dEnd + ' ' + tEnd, 'YYYY-MM-DD HH:mm');
-		
-		if( moment(endDateAndTime).isBefore( startDateAndTime )) {
-			$('#error_message').html('La date de fin ne peut être antérieure à la date de début !');
-			$('#error_messages_container').css('display','block');
-			e.preventDefault();
+	document.addEventListener('DOMContentLoaded', function() {
+		const searchBtn = document.querySelector('[name="Search"]');
+		if (searchBtn) {
+			searchBtn.addEventListener('click', function(e) {
+				const dStart = document.getElementById('startingDateOfSearch').value;
+				const dEnd = document.getElementById('endingDateOfSearch').value;
+				const tStart = document.getElementById('startingTimeOfSearch').value;
+				const tEnd = document.getElementById('endingTimeOfSearch').value;
+				const startDateAndTime = moment(dStart + ' ' + tStart, 'YYYY-MM-DD HH:mm');
+				const endDateAndTime = moment(dEnd + ' ' + tEnd, 'YYYY-MM-DD HH:mm');
+
+				if (moment(endDateAndTime).isBefore(startDateAndTime)) {
+					document.getElementById('error_message').innerHTML = 'La date de fin ne peut \u00eatre ant\u00e9rieure \u00e0 la date de d\u00e9but !';
+					document.getElementById('error_messages_container').style.display = 'block';
+					e.preventDefault();
+				}
+			});
 		}
 	});
 </script>

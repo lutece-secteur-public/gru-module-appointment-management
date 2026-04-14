@@ -39,9 +39,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
 
 import fr.paris.lutece.plugins.appointment.business.category.Category;
 import fr.paris.lutece.plugins.appointment.business.category.CategoryHome;
@@ -55,6 +55,7 @@ import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.business.state.StateFilter;
 import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
 
+@ApplicationScoped
 public class AppointmentSearchService implements IAppointmentSearchService
 {
     public static final String BEAN_NAME = "appointment-management.appointmentSearchService";
@@ -62,8 +63,8 @@ public class AppointmentSearchService implements IAppointmentSearchService
     @Inject
     private AppointmentSearchEngine _searchEngine;
 
-    @Autowired( required = false )
-    private StateService _stateService;
+    @Inject
+    private Instance<StateService> _stateServiceInstance;
 
     @Override
     public int search( List<AppointmentSearchItem> results, MultiviewFilter filter, int nStartIndex, int nPageSize, AppointmentSortConfig sortConfig )
@@ -74,9 +75,9 @@ public class AppointmentSearchService implements IAppointmentSearchService
         Map<Integer, Category> mapCategory = CategoryHome.findAllCategories( ).stream( )
                 .collect( Collectors.toMap( Category::getIdCategory, Function.identity( ) ) );
 
-        if ( _stateService != null )
+        if ( _stateServiceInstance != null && _stateServiceInstance.isResolvable( ) )
         {
-            List<State> stateList = _stateService.getListStateByFilter( new StateFilter( ) );
+            List<State> stateList = _stateServiceInstance.get( ).getListStateByFilter( new StateFilter( ) );
             mapState = stateList.stream( ).collect( Collectors.toMap( State::getId, Function.identity( ) ) );
         }
 

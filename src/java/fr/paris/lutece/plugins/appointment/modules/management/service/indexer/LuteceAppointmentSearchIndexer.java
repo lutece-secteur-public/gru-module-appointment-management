@@ -46,7 +46,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Initialized;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.lucene.document.Document;
@@ -61,7 +66,6 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.BytesRef;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.paris.lutece.plugins.appointment.business.appointment.Appointment;
 import fr.paris.lutece.plugins.appointment.business.appointment.AppointmentHome;
@@ -87,6 +91,7 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 /**
  * Appointment global indexer
  */
+@ApplicationScoped
 public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
 {
 
@@ -102,15 +107,19 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     private LuceneAppointmentIndexFactory _luceneAppointmentIndexFactory;
     private IndexWriter _indexWriter;
 
-    @Autowired( required = false )
-    private StateService _stateService;
+    @Inject
+    private Instance<StateService> _stateServiceInstance;
 
     private static AtomicBoolean _bIndexIsRunning = new AtomicBoolean( false );
     private static AtomicBoolean _bIndexToLunch = new AtomicBoolean( false );
 
     private static final Object LOCK = new Object( );
 
-    public LuteceAppointmentSearchIndexer( )
+    /**
+     * CDI startup observer - registers the indexer when the application starts
+     * @param context the servlet context
+     */
+    public void onStartup( @Observes @Initialized( ApplicationScoped.class ) ServletContext context )
     {
         IndexationService.registerIndexer( this );
     }
@@ -192,7 +201,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         }
         catch( NumberFormatException ne )
         {
-            AppLogService.error( strIdDocument + " not parseable to an int", ne );
+            AppLogService.error( "{} not parseable to an int", strIdDocument, ne );
             return new ArrayList<>( 0 );
         }
 
@@ -200,9 +209,9 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         Form form = FormHome.findByPrimaryKey( appointment.getIdForm( ) );
 
         State appointmentState = null;
-        if ( _stateService != null )
+        if ( _stateServiceInstance != null && _stateServiceInstance.isResolvable( ) )
         {
-            appointmentState = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
+            appointmentState = _stateServiceInstance.get( ).findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE, form.getIdWorkflow( ) );
         }
 
         Document doc = getDocument( appointment, appointmentState, form.getIdCategory( ) );
@@ -514,9 +523,9 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                 Form form = mapForms.get( formId );
 
                 State appointmentState = null;
-                if ( _stateService != null )
+                if ( _stateServiceInstance != null && _stateServiceInstance.isResolvable( ) )
                 {
-                    appointmentState = _stateService.findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE,
+                    appointmentState = _stateServiceInstance.get( ).findByResource( appointment.getIdAppointment( ), Appointment.APPOINTMENT_RESOURCE_TYPE,
                             form.getIdWorkflow( ) );
                 }
                 Document doc = null;
@@ -526,7 +535,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                 }
                 catch( Exception e )
                 {
-                    AppLogService.error( "Unable to index appointment with id " + appointment.getIdAppointment( ), e );
+                    AppLogService.error( "Unable to index appointment with id {}", appointment.getIdAppointment( ), e );
                 }
 
                 if ( doc != null )
