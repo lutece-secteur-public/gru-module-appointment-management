@@ -155,12 +155,11 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     public void indexDocuments( ) throws IOException, InterruptedException, SiteMessageException
     {
         List<Integer> listAppointmentId = AppointmentHome.selectAllAppointmentId( );
-
-        deleteIndex( );
         _bIndexToLunch.set( true );
 
         if ( _bIndexIsRunning.compareAndSet( false, true ) )
         {
+            deleteIndex( );
             new Thread( new IndexerRunnable( listAppointmentId ) ).start( );
         }
     }
