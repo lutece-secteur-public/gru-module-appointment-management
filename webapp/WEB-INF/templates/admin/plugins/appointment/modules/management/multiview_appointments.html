@@ -66,7 +66,7 @@
 							<@columns md=3>
 								<@formGroup labelFor='startingTimeOfSearch' labelKey='#i18n{appointment.labelTo}' rows=2>
 									<@inputGroup>
-										<@input type='time' name='startingTimeOfSearch' id='startingTimeOfSearch' value='${filter.startingTimeOfSearch!\'\'}' />
+										<@input type='html5time' name='startingTimeOfSearch' id='startingTimeOfSearch' value='${filter.startingTimeOfSearch!\'\'}' />
 										<@inputGroupItem type='text'>
 											<@icon style='clock-o' />
 										</@inputGroupItem>
@@ -86,7 +86,7 @@
 							<@columns md=3>
 								<@formGroup labelFor='endingTimeOfSearch' labelKey='#i18n{appointment.labelTo}' rows=2>
 									<@inputGroup>
-										<@input type='time' name='endingTimeOfSearch' id='endingTimeOfSearch' value='${filter.endingTimeOfSearch!\'\'}' />
+										<@input type='html5time' name='endingTimeOfSearch' id='endingTimeOfSearch' value='${filter.endingTimeOfSearch!\'\'}' />
 										<@inputGroupItem type='text'>
 											<@icon style='clock-o' />
 										</@inputGroupItem>
