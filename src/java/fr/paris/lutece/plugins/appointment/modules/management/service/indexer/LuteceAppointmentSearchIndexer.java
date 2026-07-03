@@ -165,11 +165,12 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     {
         List<Integer> listAppointmentId = AppointmentHome.selectAllAppointmentId( );
 
-        deleteIndex( );
+
         _bIndexToLunch.set( true );
 
         if ( _bIndexIsRunning.compareAndSet( false, true ) )
         {
+            deleteIndex( );
             new Thread( new IndexerRunnable( listAppointmentId ) ).start( );
         }
     }
