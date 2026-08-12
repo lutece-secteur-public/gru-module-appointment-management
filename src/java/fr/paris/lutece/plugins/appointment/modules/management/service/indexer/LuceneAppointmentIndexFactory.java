@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.appointment.modules.management.service.indexer;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -64,6 +65,12 @@ public class LuceneAppointmentIndexFactory
     private IndexWriter _indexWriter;
 
     /**
+     * Directory backing the current IndexWriter. Kept as a field because IndexWriter.close( ) does not close the Directory it was given : without this
+     * reference the underlying handle would leak on every writer re-opening.
+     */
+    private Directory _directory;
+
+    /**
      * Create the IndexWriter with its configuration
      * 
      * @param bCreateIndex
@@ -78,7 +85,10 @@ public class LuceneAppointmentIndexFactory
         {
             try
             {
-                Directory luceneDirectory = getDirectory( );
+                closeDirectory( );
+                _directory = getDirectory( );
+
+                Directory luceneDirectory = _directory;
 
                 if ( !DirectoryReader.indexExists( luceneDirectory ) )
                 {
@@ -107,8 +117,63 @@ public class LuceneAppointmentIndexFactory
     }
 
     /**
+     * Release the IndexWriter and its Directory when the Spring context is shut down.
+     *
+     * The IndexWriter is deliberately kept open for the whole life of the webapp, but it holds a native lock on the index directory ( write.lock ). That lock is
+     * registered in the JVM wide lock table, not in the web application : if it is not released when the context is destroyed, a hot redeployment leaves the
+     * stale lock behind and the new context fails with OverlappingFileLockException as soon as it tries to index.
+     *
+     * Invoked by Spring through AppInitListener.contextDestroyed -&gt; SpringContextService.shutdown( ).
+     */
+    @PreDestroy
+    public void close( )
+    {
+        if ( _indexWriter != null )
+        {
+            try
+            {
+                if ( _indexWriter.isOpen( ) )
+                {
+                    _indexWriter.close( );
+                }
+            }
+            catch( IOException e )
+            {
+                AppLogService.error( "Unable to close the Lucene Index Writer", e );
+            }
+            finally
+            {
+                _indexWriter = null;
+            }
+        }
+        closeDirectory( );
+    }
+
+    /**
+     * Close the current Directory, if any, and forget it.
+     */
+    private void closeDirectory( )
+    {
+        if ( _directory != null )
+        {
+            try
+            {
+                _directory.close( );
+            }
+            catch( IOException e )
+            {
+                AppLogService.error( "Unable to close the Lucene Directory", e );
+            }
+            finally
+            {
+                _directory = null;
+            }
+        }
+    }
+
+    /**
      * Return the Directory to use for the search
-     * 
+     *
      * @return the Directory to use for the search
      * @throws IOException
      *             - if the path string cannot be converted to a Path
