@@ -64,6 +64,8 @@ import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.BytesRef;
 
@@ -116,12 +118,47 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     private static final Object LOCK = new Object( );
 
     /**
-     * CDI startup observer - registers the indexer when the application starts
+     * CDI startup observer - registers the indexer when the application starts, and builds the whole index in the
+     * background when the index directory holds none (a fresh site, a site migrated from v7, a new node, an index
+     * directory wiped by a redeployment): the core only rebuilds indexers when its own index is missing.
      * @param context the servlet context
      */
     public void onStartup( @Observes @Initialized( ApplicationScoped.class ) ServletContext context )
     {
         IndexationService.registerIndexer( this );
+        if ( isEnable( ) && !isIndexPresent( ) )
+        {
+            try
+            {
+                indexDocuments( );
+            }
+            catch( IOException | InterruptedException | SiteMessageException e )
+            {
+                AppLogService.error( "Unable to build the appointment index", e );
+                if ( e instanceof InterruptedException )
+                {
+                    Thread.currentThread( ).interrupt( );
+                }
+            }
+        }
+    }
+
+    /**
+     * Tell whether the index directory already holds an index
+     *
+     * @return true when an index exists
+     */
+    private boolean isIndexPresent( )
+    {
+        try ( Directory directory = _luceneAppointmentIndexFactory.getDirectory( ) )
+        {
+            return DirectoryReader.indexExists( directory );
+        }
+        catch( IOException e )
+        {
+            AppLogService.error( "Unable to read the appointment index directory", e );
+            return true;
+        }
     }
 
     @Override

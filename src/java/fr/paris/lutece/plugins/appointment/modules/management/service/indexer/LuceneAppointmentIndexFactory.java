@@ -34,6 +34,8 @@
 package fr.paris.lutece.plugins.appointment.modules.management.service.indexer;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -56,6 +58,7 @@ public class LuceneAppointmentIndexFactory
     // Constants
     private static final String PATH_INDEX = "appointment-management.internalIndexer.lucene.indexPath";
     private static final String PATH_INDEX_IN_WEBAPP = "appointment-management.internalIndexer.lucene.indexInWebapp";
+    private static final String SYSTEM_TMP_DIR = "java.io.tmpdir";
 
     private IndexWriter _indexWriter;
 
@@ -103,26 +106,39 @@ public class LuceneAppointmentIndexFactory
     }
 
     /**
-     * Return the Directory to use for the search
+     * Return the Directory to use for the search, created when it does not exist yet: a fresh site has no index
+     * directory, and the core no longer resolves a webapp path that does not exist.
      * 
      * @return the Directory to use for the search
      * @throws IOException
-     *             - if the path string cannot be converted to a Path
+     *             - if the directory cannot be created or opened
      */
     public Directory getDirectory( ) throws IOException
     {
-        String strIndex;
+        Path path = getIndexPath( );
+        Files.createDirectories( path );
 
-        boolean indexInWebapp = AppPropertiesService.getPropertyBoolean( PATH_INDEX_IN_WEBAPP, true );
-        if ( indexInWebapp )
+        return FSDirectory.open( path );
+    }
+
+    /**
+     * Resolve the configured index path: relative to the webapp when indexInWebapp is set, otherwise the configured path
+     * itself, a leading java.io.tmpdir standing for the system temporary directory as for the core export path
+     * 
+     * @return the index path
+     */
+    private static Path getIndexPath( )
+    {
+        String strIndex = AppPropertiesService.getProperty( PATH_INDEX );
+        if ( AppPropertiesService.getPropertyBoolean( PATH_INDEX_IN_WEBAPP, true ) )
         {
-            strIndex = AppPathService.getPath( PATH_INDEX );
+            return Paths.get( AppPathService.getWebAppPath( ), strIndex );
         }
-        else
+        if ( strIndex.startsWith( SYSTEM_TMP_DIR ) )
         {
-            strIndex = AppPropertiesService.getProperty( PATH_INDEX );
+            return Paths.get( System.getProperty( SYSTEM_TMP_DIR ), strIndex.substring( SYSTEM_TMP_DIR.length( ) ) );
         }
 
-        return FSDirectory.open( Paths.get( strIndex ) );
+        return Paths.get( strIndex );
     }
 }
