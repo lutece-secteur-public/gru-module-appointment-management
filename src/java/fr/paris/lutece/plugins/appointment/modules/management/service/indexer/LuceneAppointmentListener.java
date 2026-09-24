@@ -34,7 +34,7 @@
 package fr.paris.lutece.plugins.appointment.modules.management.service.indexer;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.event.ObservesAsync;
 import jakarta.inject.Inject;
 
 import fr.paris.lutece.plugins.appointment.service.event.AppointmentDateChangedEvent;
@@ -43,6 +43,9 @@ import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 import fr.paris.lutece.portal.service.event.EventAction;
 import fr.paris.lutece.portal.service.event.Type;
 
+/**
+ * Keeps the appointment search index in step with the appointments of the plugin.
+ */
 @ApplicationScoped
 public class LuceneAppointmentListener
 {
@@ -50,22 +53,46 @@ public class LuceneAppointmentListener
     @Inject
     private IAppointmentSearchIndexer _indexer;
 
-    public void onAppointmentCreated( @Observes @Type( EventAction.CREATE ) AppointmentEvent event )
+    /**
+     * Index an appointment the plugin created (its events are fired asynchronously).
+     *
+     * @param event
+     *            the appointment event
+     */
+    public void onAppointmentCreated( @ObservesAsync @Type( EventAction.CREATE ) AppointmentEvent event )
     {
         _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_CREATE );
     }
 
-    public void onAppointmentUpdated( @Observes @Type( EventAction.UPDATE ) AppointmentEvent event )
+    /**
+     * Reindex an appointment the plugin updated.
+     *
+     * @param event
+     *            the appointment event
+     */
+    public void onAppointmentUpdated( @ObservesAsync @Type( EventAction.UPDATE ) AppointmentEvent event )
     {
         _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
     }
 
-    public void onAppointmentRemoved( @Observes @Type( EventAction.REMOVE ) AppointmentEvent event )
+    /**
+     * Remove from the index an appointment the plugin removed.
+     *
+     * @param event
+     *            the appointment event
+     */
+    public void onAppointmentRemoved( @ObservesAsync @Type( EventAction.REMOVE ) AppointmentEvent event )
     {
         _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_DELETE );
     }
 
-    public void onAppointmentDateChanged( @Observes AppointmentDateChangedEvent event )
+    /**
+     * Reindex an appointment moved to other slots.
+     *
+     * @param event
+     *            the appointment event
+     */
+    public void onAppointmentDateChanged( @ObservesAsync AppointmentDateChangedEvent event )
     {
         _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
     }
