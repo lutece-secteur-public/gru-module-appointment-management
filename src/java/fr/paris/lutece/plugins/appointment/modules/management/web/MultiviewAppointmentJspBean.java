@@ -72,12 +72,13 @@ import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.web.cdi.mvc.Models;
+import fr.paris.lutece.portal.web.constants.Parameters;
 import fr.paris.lutece.portal.web.util.LocalizedDelegatePaginator;
 import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 
-@Controller( controllerJsp = "MultiviewAppointment.jsp", controllerPath = "jsp/admin/plugins/appointment/modules/management", right = "MULTIVIEW_APPOINTMENT" )
+@Controller( controllerJsp = "MultiviewAppointment.jsp", controllerPath = "jsp/admin/plugins/appointment/modules/management/", right = "MULTIVIEW_APPOINTMENT" )
 @SessionScoped
 @Named
 public class MultiviewAppointmentJspBean extends MVCAdminJspBean
@@ -89,8 +90,6 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
 
     // Parameters
     private static final String PARAMETER_PAGE_INDEX = "page_index";
-    private static final String PARAMETER_ORDER_BY = "orderBy";
-    private static final String PARAMETER_ORDER_ASC = "orderAsc";
     private static final String PARAMETER_SEARCH = "Search";
     private static final String PARAMETER_RESET = "reset";
     private static final String PARAMETER_SELECTED_DEFAULT_FIELD = "selectedDefaultFieldList";
@@ -229,8 +228,8 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, nDefaultItemsPerPage );
 
 
-        String sortName = request.getParameter( PARAMETER_ORDER_BY );
-        String sortOrderAsc = request.getParameter( PARAMETER_ORDER_ASC );
+        String sortName = request.getParameter( Parameters.SORTED_ATTRIBUTE_NAME );
+        String sortOrderAsc = request.getParameter( Parameters.SORTED_ASC );
 
         if ( StringUtils.isEmpty( sortName ) )
         {
