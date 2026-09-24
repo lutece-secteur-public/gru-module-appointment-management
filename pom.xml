@@ -58,8 +58,6 @@
 
     <properties>
         <componentName>appointment-management</componentName>
-        <jiraProjectName>APPMAN</jiraProjectName>
-        <jiraComponentId />
     </properties>
     <scm>
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-appointment-management.git</connection>
