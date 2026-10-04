@@ -63,6 +63,8 @@ import fr.paris.lutece.plugins.appointment.service.export.ExcelAppointmentGenera
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
 import fr.paris.lutece.plugins.filegenerator.service.TemporaryFileGeneratorService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.security.SecurityTokenHandler;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -78,7 +80,7 @@ import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 
-@Controller( controllerJsp = "MultiviewAppointment.jsp", controllerPath = "jsp/admin/plugins/appointment/modules/management/", right = "MULTIVIEW_APPOINTMENT" )
+@Controller( controllerJsp = "MultiviewAppointment.jsp", controllerPath = "jsp/admin/plugins/appointment/modules/management/", right = "MULTIVIEW_APPOINTMENT", securityTokenEnabled = true )
 @SessionScoped
 @Named
 public class MultiviewAppointmentJspBean extends MVCAdminJspBean
@@ -128,6 +130,8 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
     private Models _models;
     @Inject
     private TemporaryFileGeneratorService _temporaryFileGeneratorService;
+    @Inject
+    private SecurityTokenService _securityTokenService;
     private String _strCurrentPageIndex;
     private int _nItemsPerPage;
     private AppointmentSortConfig _sortConfig;
@@ -140,7 +144,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
      *            The request on which to retrieve informations
      * @return the view associated to the responses value of all forms
      */
-    @View( value = MULTIVIEW_APPOINTMENTS, defaultView = true )
+    @View( value = MULTIVIEW_APPOINTMENTS, defaultView = true, securityTokenAction = ACTION_EXPORT_APPOINTMENTS )
     public String getMultiviewAppointments( HttpServletRequest request )
     {
         initiatePaginatorProperties( request );
@@ -175,6 +179,7 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         _models.put( MARK_LIST_FORMS, formList );
         _models.put( MARK_LIST_CATEGORIES, getListCategories( ) );
         _models.put( MARK_DEFAULT_FIELD_LIST, AppointmentExportService.getDefaultColumnList( getLocale( ) ) );
+        _models.put( SecurityTokenHandler.MARK_CSRF_TOKEN, _securityTokenService.getToken( request, ACTION_EXPORT_APPOINTMENTS ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MULTIVIEW_APPOINTMENTS, TEMPLATE_MULTIVIEW_APPOINTMENT, _models );
     }
