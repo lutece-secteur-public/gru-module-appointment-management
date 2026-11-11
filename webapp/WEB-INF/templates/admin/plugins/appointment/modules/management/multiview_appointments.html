@@ -12,7 +12,7 @@
 	<@pageColumn>
 		<@pageHeader title='#i18n{module.appointment.management.multiview.appointment.pageTitle}'>
 			<@button style='card-control collapse' buttonTargetId='#searchAppointment' title='#i18n{appointment.manageAppointments.labelSearch}' hideTitle=['xs','sm'] buttonIcon='search' color='light' />
-			<@aButton params='data-bs-toggle="modal" data-bs-target="#export_modal"' buttonIcon='download' title='#i18n{appointment.permission.label.exportMassAppointment}' color='primary' />
+			<@aButton params={"data-bs-toggle": "modal", "data-bs-target": "#export_modal"} buttonIcon='download' title='#i18n{appointment.permission.label.exportMassAppointment}' color='primary' />
 		</@pageHeader>
 		<@messages errors=(errors![]) warnings=(warnings![]) infos=(infos![]) />
 		<@div id='searchAppointment' class='collapse'>
@@ -82,7 +82,7 @@
 						</@formGroup>
 					</@columns>
 				</@row>
-				<@alert color='danger' id='error_message' params='hidden'>#i18n{module.appointment.management.multiview.errorEndBeforeStart}</@alert>
+				<@alert color='danger' id='error_message' params={"hidden": true}>#i18n{module.appointment.management.multiview.errorEndBeforeStart}</@alert>
 				<@formGroup rows=2>
 					<@button type='submit' name='Search' buttonIcon='search' title='#i18n{appointment.manageAppointments.labelSearch}' />
 					<@aButton href='${jspUrl}&reset=true' buttonIcon='refresh' title='#i18n{appointment.displayAppointmentForm.labelReset}' color='light' />
@@ -128,7 +128,7 @@
 						</@td>
 						<@td>${appointment.stateTitle!}</@td>
 						<@td>
-							<@aButton href='jsp/admin/plugins/appointment/ManageAppointments.jsp?view=viewAppointment&id_form=${appointment.idForm}&id_appointment=${appointment.idAppointment}' title='#i18n{appointment.manageAppointments.labelViewAppointment}' hideTitle=['all'] buttonIcon='eye' size='sm' params='target="_blank"' />
+							<@aButton href='jsp/admin/plugins/appointment/ManageAppointments.jsp?view=viewAppointment&id_form=${appointment.idForm}&id_appointment=${appointment.idAppointment}' title='#i18n{appointment.manageAppointments.labelViewAppointment}' hideTitle=['all'] buttonIcon='eye' size='sm' target="_blank" />
 						</@td>
 					</@tr>
 					</#list>
