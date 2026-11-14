@@ -207,8 +207,19 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
 
         if ( _bIndexIsRunning.compareAndSet( false, true ) )
         {
-            deleteIndex( );
-            new Thread( new IndexerRunnable( listAppointmentId ) ).start( );
+            try
+            {
+                deleteIndex( );
+                new Thread( new IndexerRunnable( listAppointmentId ) ).start( );
+            }
+            catch( RuntimeException e )
+            {
+                // the index writer may be unusable (write lock replaced, writer closed): drop it so that the next
+                // indexing opens a new one, and let the next indexing run
+                AppLogService.error( "Unable to start the appointment indexing", e );
+                resetIndexWriter( );
+                _bIndexIsRunning.set( false );
+            }
         }
     }
 
@@ -417,6 +428,26 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         }
     }
 
+    /**
+     * Drop the current index writer without committing it, so that the next indexing opens a new one
+     */
+    private void resetIndexWriter( )
+    {
+        IndexWriter indexWriter = _indexWriter;
+        _indexWriter = null;
+        if ( indexWriter != null && indexWriter.isOpen( ) )
+        {
+            try
+            {
+                indexWriter.rollback( );
+            }
+            catch( IOException | RuntimeException e )
+            {
+                AppLogService.error( "Unable to close the appointment index writer", e );
+            }
+        }
+    }
+
     private class IndexerRunnable implements Runnable
     {
         private final List<Integer> _idList;
@@ -445,6 +476,7 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             catch( Exception e )
             {
                 AppLogService.error( e.getMessage( ), e );
+                resetIndexWriter( );
                 Thread.currentThread( ).interrupt( );
             }
             finally
