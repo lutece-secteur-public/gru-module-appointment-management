@@ -255,6 +255,12 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
         }
 
         AppointmentDTO appointment = AppointmentService.buildAppointmentDTOFromIdAppointment( nIdAppointment );
+        if ( appointment == null )
+        {
+            // the appointment was deleted since the indexer action was recorded: nothing left to index
+            AppLogService.debug( "Appointment {} not found, not indexed", nIdAppointment );
+            return new ArrayList<>( 0 );
+        }
         Form form = FormHome.findByPrimaryKey( appointment.getIdForm( ) );
 
         State appointmentState = null;

@@ -37,8 +37,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
@@ -138,6 +140,18 @@ public class LuteceAppointmentSearchIndexerTest extends LuteceTestCase
         {
             assertTrue( DirectoryReader.indexExists( directory ) );
         }
+    }
+
+    /**
+     * An indexer action refers to an appointment deleted since: there is no document to index for it
+     */
+    @Test
+    public void testGetDocumentsOfDeletedAppointment( ) throws Exception
+    {
+        List<Document> listDocument = _indexer.getDocuments( String.valueOf( Integer.MAX_VALUE ) );
+
+        assertNotNull( listDocument );
+        assertTrue( listDocument.isEmpty( ) );
     }
 
     private static AtomicBoolean getIndexRunningFlag( ) throws ReflectiveOperationException
