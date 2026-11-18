@@ -232,7 +232,6 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
 
     private void initiatePaginatorProperties( HttpServletRequest request )
     {
-        _sortConfig = null;
         _strCurrentPageIndex = AbstractPaginator.getPageIndex( request, AbstractPaginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 50 );
         _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, nDefaultItemsPerPage );
@@ -241,6 +240,11 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         String sortName = request.getParameter( Parameters.SORTED_ATTRIBUTE_NAME );
         String sortOrderAsc = request.getParameter( Parameters.SORTED_ASC );
 
+        // The links of the paginator carry no sort: keep the sort of the session, unless the search is reset
+        if ( StringUtils.isEmpty( sortName ) && _sortConfig != null && request.getParameter( PARAMETER_RESET ) == null )
+        {
+            return;
+        }
         if ( StringUtils.isEmpty( sortName ) )
         {
             sortName = START_DATE;
