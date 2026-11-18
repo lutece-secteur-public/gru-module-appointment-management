@@ -152,6 +152,11 @@ public class MultiviewAppointmentJspBean extends MVCAdminJspBean
         // If it is a new search
         if ( request.getParameter( PARAMETER_SEARCH ) != null )
         {
+            // A search can be the first request of the session
+            if ( _filter == null )
+            {
+                _filter = new MultiviewFilter( );
+            }
             // Populate the filter
             populate( _filter, request );
             _strCurrentPageIndex = "1";
