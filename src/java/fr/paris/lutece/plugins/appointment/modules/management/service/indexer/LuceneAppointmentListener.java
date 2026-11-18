@@ -38,6 +38,7 @@ import jakarta.enterprise.event.ObservesAsync;
 import jakarta.inject.Inject;
 
 import fr.paris.lutece.plugins.appointment.service.event.AppointmentDateChangedEvent;
+import fr.paris.lutece.plugins.appointment.service.event.AppointmentWorkflowActionEvent;
 import fr.paris.lutece.plugins.appointment.service.event.AppointmentEvent;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
 import fr.paris.lutece.portal.service.event.EventAction;
@@ -93,6 +94,17 @@ public class LuceneAppointmentListener
      *            the appointment event
      */
     public void onAppointmentDateChanged( @ObservesAsync AppointmentDateChangedEvent event )
+    {
+        _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
+    }
+
+    /**
+     * Reindex an appointment on which a workflow action was run: its workflow state is stored in the index.
+     *
+     * @param event
+     *            the workflow action event
+     */
+    public void onAppointmentWorkflowAction( @ObservesAsync AppointmentWorkflowActionEvent event )
     {
         _indexer.indexDocument( event.getIdAppointment( ), IndexerAction.TASK_MODIFY );
     }
