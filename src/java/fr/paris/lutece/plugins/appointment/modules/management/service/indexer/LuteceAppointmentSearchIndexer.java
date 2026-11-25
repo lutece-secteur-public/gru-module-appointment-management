@@ -81,9 +81,9 @@ import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentFilterDTO;
 import fr.paris.lutece.plugins.workflowcore.business.state.State;
 import fr.paris.lutece.plugins.workflowcore.service.state.StateService;
+import fr.paris.lutece.plugins.appointment.modules.management.business.indexer.AppointmentIndexerAction;
+import fr.paris.lutece.plugins.appointment.modules.management.business.indexer.AppointmentIndexerActionHome;
 import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
-import fr.paris.lutece.portal.business.indexeraction.IndexerActionFilter;
-import fr.paris.lutece.portal.business.indexeraction.IndexerActionHome;
 import fr.paris.lutece.portal.service.message.SiteMessageException;
 import fr.paris.lutece.portal.service.search.IndexationService;
 import fr.paris.lutece.portal.service.search.SearchItem;
@@ -226,11 +226,14 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
     @Override
     public void indexDocument( int nIdAppointment, int idTask )
     {
-        IndexerAction action = new IndexerAction( );
-        action.setIdDocument( String.valueOf( nIdAppointment ) );
-        action.setIdTask( idTask );
-        action.setIndexerName( INDEXER_NAME );
-        IndexerActionHome.create( action );
+        // the multiview index has its own queue: the core search indexing processes and removes every row of
+        // core_indexer_action, which would take the change before the multiview indexer reads it
+        AppointmentIndexerActionHome.create( nIdAppointment, idTask );
+        if ( isEnable( ) )
+        {
+            // the core (global) search index is fed by the core indexing, through its own queue
+            IndexationService.addIndexerAction( String.valueOf( nIdAppointment ), INDEXER_NAME, idTask );
+        }
 
         _bIndexToLunch.set( true );
         if ( _bIndexIsRunning.compareAndSet( false, true ) )
@@ -489,6 +492,12 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
             {
                 _bIndexIsRunning.set( false );
             }
+            // an action queued after the last check of the loop and before the reset above found the indexer running and
+            // started nothing: start again for it
+            if ( _bIndexToLunch.get( ) && _bIndexIsRunning.compareAndSet( false, true ) )
+            {
+                new Thread( new IndexerRunnable( ) ).start( );
+            }
         }
 
         private void processIndexing( )
@@ -501,29 +510,25 @@ public class LuteceAppointmentSearchIndexer implements IAppointmentSearchIndexer
                 Set<Integer> listIdsToDelete = new HashSet<>( );
 
                 // Delete all record which must be delete
-                IndexerActionFilter filter = new IndexerActionFilter( );
-                filter.setIdTask( IndexerAction.TASK_DELETE );
-                for ( IndexerAction action : IndexerActionHome.getList( filter ) )
+                for ( AppointmentIndexerAction action : AppointmentIndexerActionHome.getListByTask( IndexerAction.TASK_DELETE ) )
                 {
-                    listIdsToDelete.add( Integer.valueOf( action.getIdDocument( ) ) );
-                    IndexerActionHome.remove( action.getIdAction( ) );
+                    listIdsToDelete.add( action.getIdAppointment( ) );
+                    AppointmentIndexerActionHome.remove( action.getIdAction( ) );
                 }
 
                 // Update all record which must be update
-                filter.setIdTask( IndexerAction.TASK_MODIFY );
-                for ( IndexerAction action : IndexerActionHome.getList( filter ) )
+                for ( AppointmentIndexerAction action : AppointmentIndexerActionHome.getListByTask( IndexerAction.TASK_MODIFY ) )
                 {
-                    listIdsToDelete.add( Integer.valueOf( action.getIdDocument( ) ) );
-                    listIdsToAdd.add( Integer.valueOf( action.getIdDocument( ) ) );
-                    IndexerActionHome.remove( action.getIdAction( ) );
+                    listIdsToDelete.add( action.getIdAppointment( ) );
+                    listIdsToAdd.add( action.getIdAppointment( ) );
+                    AppointmentIndexerActionHome.remove( action.getIdAction( ) );
                 }
 
-                // Update all record which must be update
-                filter.setIdTask( IndexerAction.TASK_CREATE );
-                for ( IndexerAction action : IndexerActionHome.getList( filter ) )
+                // Add all record which must be created
+                for ( AppointmentIndexerAction action : AppointmentIndexerActionHome.getListByTask( IndexerAction.TASK_CREATE ) )
                 {
-                    listIdsToAdd.add( Integer.valueOf( action.getIdDocument( ) ) );
-                    IndexerActionHome.remove( action.getIdAction( ) );
+                    listIdsToAdd.add( action.getIdAppointment( ) );
+                    AppointmentIndexerActionHome.remove( action.getIdAction( ) );
                 }
 
                 List<Query> queryList = new ArrayList<>( TAILLE_LOT );

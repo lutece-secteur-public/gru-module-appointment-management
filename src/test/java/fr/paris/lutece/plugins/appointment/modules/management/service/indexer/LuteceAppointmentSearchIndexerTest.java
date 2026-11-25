@@ -41,8 +41,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.jupiter.api.AfterEach;
@@ -50,6 +52,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import fr.paris.lutece.plugins.appointment.modules.management.business.search.AppointmentSearchItem;
+import fr.paris.lutece.portal.business.indexeraction.IndexerAction;
+import fr.paris.lutece.portal.business.indexeraction.IndexerActionHome;
 import fr.paris.lutece.test.LuteceTestCase;
 
 /**
@@ -152,6 +157,74 @@ public class LuteceAppointmentSearchIndexerTest extends LuteceTestCase
 
         assertNotNull( listDocument );
         assertTrue( listDocument.isEmpty( ) );
+    }
+
+    /**
+     * The multiview indexer leaves the pending actions of the other indexers of the site to the core indexing
+     */
+    @Test
+    public void testActionOfAnotherIndexerIsLeft( ) throws Exception
+    {
+        IndexerAction other = new IndexerAction( );
+        other.setIdDocument( "424242" );
+        other.setIdTask( IndexerAction.TASK_MODIFY );
+        other.setIndexerName( "OtherIndexer" );
+        IndexerActionHome.create( other );
+        try
+        {
+            _indexer.indexDocument( Integer.MAX_VALUE, IndexerAction.TASK_DELETE );
+            waitEndOfIndexing( );
+
+            assertNotNull( IndexerActionHome.findByPrimaryKey( other.getIdAction( ) ), "The action of another indexer was removed" );
+        }
+        finally
+        {
+            IndexerActionHome.remove( other.getIdAction( ) );
+        }
+    }
+
+    /**
+     * The core incremental indexing processes and removes every row of core_indexer_action: when it runs between the
+     * queueing of an appointment and the multiview indexing, the multiview index must still be updated
+     */
+    @Test
+    public void testCoreIndexingDoesNotTakeTheMultiviewAction( ) throws Exception
+    {
+        int nIdAppointment = 987654;
+        Document doc = new Document( );
+        doc.add( new IntPoint( AppointmentSearchItem.FIELD_ID_APPOINTMENT, nIdAppointment ) );
+        IndexWriter writer = _factory.getIndexWriter( false );
+        writer.addDocument( doc );
+        writer.commit( );
+        assertEquals( 1, countDocuments( nIdAppointment ) );
+
+        // the multiview indexing waits for the lock while the core indexing consumes the shared table
+        synchronized ( getLock( ) )
+        {
+            _indexer.indexDocument( nIdAppointment, IndexerAction.TASK_DELETE );
+            for ( IndexerAction action : IndexerActionHome.getList( ) )
+            {
+                IndexerActionHome.remove( action.getIdAction( ) );
+            }
+        }
+        waitEndOfIndexing( );
+
+        assertEquals( 0, countDocuments( nIdAppointment ), "The removal of the appointment did not reach the multiview index" );
+    }
+
+    private int countDocuments( int nIdAppointment ) throws IOException
+    {
+        try ( Directory directory = FSDirectory.open( _indexPath ); DirectoryReader reader = DirectoryReader.open( directory ) )
+        {
+            return new IndexSearcher( reader ).count( IntPoint.newExactQuery( AppointmentSearchItem.FIELD_ID_APPOINTMENT, nIdAppointment ) );
+        }
+    }
+
+    private static Object getLock( ) throws ReflectiveOperationException
+    {
+        Field field = LuteceAppointmentSearchIndexer.class.getDeclaredField( "LOCK" );
+        field.setAccessible( true );
+        return field.get( null );
     }
 
     private static AtomicBoolean getIndexRunningFlag( ) throws ReflectiveOperationException
